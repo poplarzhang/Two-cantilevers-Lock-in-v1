@@ -1,0 +1,25 @@
+HF2LI Experiment
+=========================
+
+Settings
+-------------------------
+DEVICE_ID: dev376
+OUTPUT_CHANNEL: 0
+OFFSET: 0.0
+AMPLITUDE: 0.2
+INPUT_RANGE_1: 1.0
+INPUT_RANGE_2: 1.0
+DEMOD_RATE_1: 1000
+DEMOD_RATE_2: 1000
+F_START: 100
+F_STOP: 10000
+POINTS: 200
+TIME_CONSTANT: 0.05
+SWEEP_MODE: linear
+AVERAGES: 10
+
+Metadata
+-------------------------
+device: dev376
+experiment: Two cantilever resonance measurement
+experiment_angle: 0.0
