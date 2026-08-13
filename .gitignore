@@ -1,2 +1,4 @@
 data/
 instrument/*.pyc
+*.png
+*.zip

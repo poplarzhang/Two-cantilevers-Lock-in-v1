@@ -44,7 +44,8 @@ def plot_calibration(calibration):
 
     plt.title(
         # f"Calibration map"{}
-        f"Calibration map({timestamp})" # timestamp added //11AUG YZ
+        f"Cantilever ratio - ({timestamp})" # timestamp added //11AUG YZ 
+        #//13AUG Cantilever ratio changed from calibration map
         
     )
 
@@ -97,7 +98,7 @@ def plot_calibration_cantilevers(calibration):
     plt.ylabel("Imaginary(Z0)")
 
     plt.title(
-        f"Cantilever 1 ({timestamp})"
+        f"Cantilever 1 - ({timestamp})"
     )
 
     plt.grid(True)
@@ -137,7 +138,7 @@ def plot_calibration_cantilevers(calibration):
     )
 
     plt.title(
-        f"Cantilever 2 ({timestamp})"
+        f"Cantilever 2 - ({timestamp})"
     )
 
     plt.grid(True)
@@ -184,7 +185,7 @@ def plot_calibration_diff(calibration):
 
     plt.title(
        
-        f"Cantilever diff({timestamp})" 
+        f"Cantilever diff - ({timestamp})" 
         
     )
 

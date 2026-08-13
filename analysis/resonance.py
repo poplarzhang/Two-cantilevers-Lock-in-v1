@@ -191,7 +191,7 @@ def fit_resonance(
     f0 = parameters[0]
     gamma = parameters[1]
 
-    Q = (f0 / (2*gamma) )# blanks removed for clarity //10/AUG YZ
+    Q = (f0 / (2*gamma) )
 
 
     return {
