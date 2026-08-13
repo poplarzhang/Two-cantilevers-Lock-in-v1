@@ -81,7 +81,7 @@ OFFSET = 0
 #
 # Units: Volt
 #
-AMPLITUDE = 0.002
+AMPLITUDE = 0.005
 
 
 
@@ -200,7 +200,7 @@ HARMONIC = 1
 # Units: Hz
 #
 
-F_START = 850
+F_START = 700
 
 
 # Stop frequency.
@@ -208,7 +208,7 @@ F_START = 850
 # Units: Hz
 #
 
-F_STOP = 950
+F_STOP = 1200
 
 # Number of frequency points.
 
