@@ -2,3 +2,5 @@ data/
 instrument/*.pyc
 *.png
 *.zip
+.ipynb_checkpoints/
+__pycache__/
