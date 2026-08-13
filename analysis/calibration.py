@@ -121,8 +121,6 @@ def build_calibration(folder):
             allow_pickle=True
         ).item()
 
-
-
         # -----------------------------
         # Read angle from metadata
         # -----------------------------
@@ -132,15 +130,11 @@ def build_calibration(folder):
             ["experiment_angle"]
         )
 
-
-
         # -----------------------------
         # Calculate mean complex point
         # -----------------------------
         # commented to take mean(z0)/mean(z1) for calibration, begins //11AUG YZ
-        # z = calculate_complex_point(
-        #     measurement
-        # )
+        # z = calculate_complex_point(measurement)
         # commented to take man(z0)/mean(z1)) for calibration, ends //11AUG YZ
         z0_mean, z1_mean, zr_mean, zd_mean = calculate_complex_point(measurement) 
         #zr_mean = mean(z0)/mean(z1) //11AUG YZ

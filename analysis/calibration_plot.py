@@ -14,7 +14,6 @@ def plot_calibration(calibration):
 
     y = np.imag(points)
 
-
     plt.figure(figsize=(7,6))
 
 
@@ -26,7 +25,6 @@ def plot_calibration(calibration):
         s=10 # changed from 60 //11AUG YZ
     )
 
-
     for i, angle in enumerate(angles):
 
         plt.text(
@@ -35,7 +33,6 @@ def plot_calibration(calibration):
             f"{angle:.0f}°",
             fontsize =6
         )
-
 
     plt.xlabel(
         "Real(Zr)" # Zr is changed from Z //12AUG YZ
@@ -51,12 +48,10 @@ def plot_calibration(calibration):
         
     )
 
-
     plt.colorbar(
         scatter,
         label="Angle (deg)"
     )
-
 
     plt.grid(True)
 
@@ -97,13 +92,9 @@ def plot_calibration_cantilevers(calibration):
             fontsize=6
         )
 
-    plt.xlabel(
-        "Real(Z0)"
-    )
+    plt.xlabel("Real(Z0)")
 
-    plt.ylabel(
-        "Imaginary(Z0)"
-    )
+    plt.ylabel("Imaginary(Z0)")
 
     plt.title(
         f"Cantilever 1 ({timestamp})"
@@ -139,9 +130,7 @@ def plot_calibration_cantilevers(calibration):
             fontsize=6
         )
 
-    plt.xlabel(
-        "Real(Z1)"
-    )
+    plt.xlabel("Real(Z1)")
 
     plt.ylabel(
         "Imaginary(Z1)"
@@ -170,9 +159,7 @@ def plot_calibration_diff(calibration):
 
     y = np.imag(points)
 
-
     plt.figure(figsize=(7,6))
-
 
     scatter = plt.scatter(
         x,
@@ -181,7 +168,6 @@ def plot_calibration_diff(calibration):
         cmap="viridis",
         s=10 # changed from 60 //11AUG YZ
     )
-
 
     for i, angle in enumerate(angles):
 
@@ -192,14 +178,9 @@ def plot_calibration_diff(calibration):
             fontsize =6
         )
 
+    plt.xlabel("Real(Zd)")
 
-    plt.xlabel(
-        "Real(Zd)"
-    )
-
-    plt.ylabel(
-        "Imaginary(Zd)"
-    )
+    plt.ylabel("Imaginary(Zd)")
 
     plt.title(
        
@@ -207,12 +188,10 @@ def plot_calibration_diff(calibration):
         
     )
 
-
     plt.colorbar(
         scatter,
         label="Angle (deg)"
     )
-
 
     plt.grid(True)
 
