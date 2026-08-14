@@ -4,11 +4,12 @@ from datetime import datetime # added for enabling timestamp in the plot title /
 
 timestamp = datetime.now().strftime("%m-%d %H:%M:%S") # implemenet the timestamp in the plot title //11AUG YZ
 
+
 def plot_calibration(calibration):
 
     angles = calibration["angles"]
 
-    points = calibration["complex_points"]
+    points = calibration["ratio_points"]
 
     x = np.real(points)
 
@@ -154,7 +155,7 @@ def plot_calibration_diff(calibration):
 
     angles = calibration["angles"]
 
-    points = calibration["difference_points"]
+    points = calibration["diff_points"]
 
     x = np.real(points)
 
@@ -198,3 +199,45 @@ def plot_calibration_diff(calibration):
 
     plt.axis("equal")
 # plot two cantilevers mean values difference by angle ends //12AUG YZ
+
+# plot ratio of two cantilevers mean magnitude by angle begins //14AUG YZ
+def plot_calibration_rmmag(calibration): #rmmag is short for ratio of mean magnitude //14AUG YZ
+
+    angles = np.asarray(
+        calibration["angles"]
+    )
+
+    zm_mean = np.asarray(
+        calibration["ratio_mean_mag"]
+    )
+
+    plt.figure(figsize=(7, 6))
+
+    plt.scatter(
+        angles,
+        zm_mean,
+        s=10,
+        color="tab:blue"
+    )
+
+    for i, angle in enumerate(angles):
+
+        plt.text(
+            angles[i],
+            zm_mean[i],
+            f"{angle:.0f}°",
+            fontsize=6
+        )
+
+    plt.xlabel("Angle (deg)")
+
+    plt.ylabel("Ratio of Mean(|z0|) / Mean(|z1|)")
+
+    plt.title(
+        f"Cantilever ratio_mag - ({timestamp})"
+    )
+
+    plt.grid(True)
+
+    plt.tight_layout()
+# plot ratio of two cantilevers mean magnitude by angle ends //14AUG YZ

@@ -1,13 +1,5 @@
-"""
-HF2LI measurement recorder.
-
-Records X,Y,R,phase from selected demodulators.
-"""
-
-
+# HF2LI measurement recorder.Records X,Y,R,phase from selected demodulators.
 import time
-
-
 
 class HF2LIRecorder:
 
@@ -21,8 +13,6 @@ class HF2LIRecorder:
         self.lockin = lockin
 
         self.demods = demods
-
-
 
     # -------------------------------------------------
     # Record measurement
@@ -38,18 +28,13 @@ class HF2LIRecorder:
 
         Returns dictionary compatible with old recorder.
         """
-
-
         print(
             "Starting measurement"
         )
 
 
         self.lockin.enable_excitation()
-
-
         data = {}
-
 
         # -----------------------------------------
         # Stream all demodulators
@@ -59,7 +44,6 @@ class HF2LIRecorder:
             demods=self.demods,
             duration=duration
         )
-
 
         # -----------------------------------------
         # Use first demod time base
@@ -73,7 +57,6 @@ class HF2LIRecorder:
             -
             first["timestamp"][0]
         )
-
 
         # -----------------------------------------
         # Copy demod data
@@ -98,13 +81,9 @@ class HF2LIRecorder:
             len(data["time"])
         )
 
-
         self.lockin.disable_excitation()
-
 
         print(
             "Excitation disabled"
         )
-
-
         return data

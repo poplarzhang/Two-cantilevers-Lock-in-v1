@@ -4,3 +4,4 @@ instrument/*.pyc
 *.zip
 .ipynb_checkpoints/
 __pycache__/
+utils/*.pyc

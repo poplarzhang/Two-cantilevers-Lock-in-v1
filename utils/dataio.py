@@ -136,18 +136,8 @@ def save_measurement(
 # Load measurement
 # ==========================================================
 
+
 def load_measurement(filepath):
-    """
-    Load one measurement.
-
-    Parameters
-    ----------
-    filepath : str
-
-    Returns
-    -------
-    dict
-    """
 
     measurement = np.load(
         filepath,
@@ -155,6 +145,33 @@ def load_measurement(filepath):
     )
 
     return measurement.item()
+
+
+# input path for load experiment, begins //14AUG YZ
+def load_measurement_pathinput():
+    while True:
+        filepath = input(
+            "enter the filepath of a measurement, q to quit: "
+        ).strip()
+
+        if filepath.lower() == "q":
+            print("quit")
+            return None
+
+        try:
+            measurement = load_measurement(filepath)
+
+            print(f"loading successful: {filepath}")
+            return measurement
+
+        except FileNotFoundError:
+            print(f"cannot find file: {filepath}")
+            print("reenter the filepath, q to quit")
+
+        except Exception as e:
+            print(f"cannot be loaded: {e}")
+            print("reenter the filepath, q to quit") 
+# input path for load experiment, ends //14AUG YZ
 
 
 # ==========================================================
