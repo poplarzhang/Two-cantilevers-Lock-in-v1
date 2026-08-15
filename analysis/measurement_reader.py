@@ -12,12 +12,19 @@ def load_measurements(folder):
     Returns a list of dictionaries.
     """
 
-    files = sorted(
-        [
-            f for f in os.listdir(folder)
-            if f.endswith(".npy")
-        ]
-    )
+    # files = sorted( # commented to screen out unecessary files such as calibration.npy //15AUG YZ 
+    #     [
+    #         f for f in os.listdir(folder)
+    #         if f.endswith(".npy")
+    #     ]
+    # )
+    files = sorted( # implement screen 15AUG YZ
+    [
+        f for f in os.listdir(folder)
+        if f.lower().endswith(".npy")
+        and f.lower() != "calibration.npy"
+    ]
+)
 
 
     measurements = []

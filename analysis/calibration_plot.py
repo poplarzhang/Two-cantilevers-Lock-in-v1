@@ -1,12 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime # added for enabling timestamp in the plot title //11AUG YZ
+import os
 
 timestamp = datetime.now().strftime("%m-%d %H:%M:%S") # implemenet the timestamp in the plot title //11AUG YZ
 
 
-def plot_calibration(calibration):
-
+def plot_calibration(
+    calibration,
+    save_path
+    ): #plot cantilever 1 / cantilever 2 //15AUG YZ
+   
     angles = calibration["angles"]
 
     points = calibration["ratio_points"]
@@ -56,13 +60,27 @@ def plot_calibration(calibration):
     )
 
     plt.grid(True)
-
     plt.axis("equal")
+
+    if save_path is not None: # save the plot //15AUG YZ
+        plt.savefig(
+            save_path,
+            dpi=300,
+            bbox_inches="tight"
+        )
+
+    plt.show()
+    plt.close()    
 
 
 # plot two cantilevers mean values by angle begins //11AUG YZ
 
-def plot_calibration_cantilevers(calibration):
+def plot_calibration_cantilevers(
+    calibration,
+    save_path_CL1,
+    save_path_CL2
+):
+
 
     angles = calibration["angles"]
 
@@ -103,9 +121,18 @@ def plot_calibration_cantilevers(calibration):
     )
 
     plt.grid(True)
-
     plt.axis("equal")
 
+    if save_path_CL1 is not None: # save the plot //15AUG YZ
+            plt.savefig(
+                save_path_CL1,
+                dpi=300,
+                bbox_inches="tight"
+            )
+            
+    plt.show()
+    plt.close() 
+    
 
 # cantilever 2 takes z1_means //11AUG YZ  
 
@@ -143,15 +170,25 @@ def plot_calibration_cantilevers(calibration):
     )
 
     plt.grid(True)
-
     plt.axis("equal")
 
+    if save_path_CL2 is not None: # save the plot //15AUG YZ
+        plt.savefig(
+            save_path_CL2,
+            dpi=300,
+            bbox_inches="tight"
+        )
+        
     plt.show()
+    plt.close() 
 # plot two cantilevers mean values by angle ends //11AUG YZ
 
 # plot two cantilevers mean values difference by angle begins //12AUG YZ
 
-def plot_calibration_diff(calibration):
+def plot_calibration_diff(
+    calibration,
+    save_path
+    ):
 
     angles = calibration["angles"]
 
@@ -196,12 +233,24 @@ def plot_calibration_diff(calibration):
     )
 
     plt.grid(True)
-
     plt.axis("equal")
+    if save_path is not None: # save the plot //15AUG YZ
+        plt.savefig(
+            save_path,
+            dpi=300,
+            bbox_inches="tight"
+        )
+
+    plt.show()
+    plt.close()
+
 # plot two cantilevers mean values difference by angle ends //12AUG YZ
 
 # plot ratio of two cantilevers mean magnitude by angle begins //14AUG YZ
-def plot_calibration_rmmag(calibration): #rmmag is short for ratio of mean magnitude //14AUG YZ
+def plot_calibration_rmmag(
+    calibration,
+    save_path=None
+): #rmmag is short for ratio of mean magnitude //14AUG YZ
 
     angles = np.asarray(
         calibration["angles"]
@@ -240,4 +289,14 @@ def plot_calibration_rmmag(calibration): #rmmag is short for ratio of mean magni
     plt.grid(True)
 
     plt.tight_layout()
+
+    if save_path is not None: # save the plot //15AUG YZ
+        plt.savefig(
+            save_path,
+            dpi=300,
+            bbox_inches="tight"
+        )
+
+    plt.show()
+    plt.close()
 # plot ratio of two cantilevers mean magnitude by angle ends //14AUG YZ
