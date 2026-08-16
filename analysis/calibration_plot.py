@@ -60,7 +60,8 @@ def plot_calibration(
     )
 
     plt.grid(True)
-    plt.axis("equal")
+    #plt.axis("equal")
+    plt.autoscale()
 
     if save_path is not None: # save the plot //15AUG YZ
         plt.savefig(
@@ -121,7 +122,8 @@ def plot_calibration_cantilevers(
     )
 
     plt.grid(True)
-    plt.axis("equal")
+    #plt.axis("equal")
+    plt.autoscale()
 
     if save_path_CL1 is not None: # save the plot //15AUG YZ
             plt.savefig(
@@ -170,7 +172,8 @@ def plot_calibration_cantilevers(
     )
 
     plt.grid(True)
-    plt.axis("equal")
+    #plt.axis("equal")
+    plt.autoscale()
 
     if save_path_CL2 is not None: # save the plot //15AUG YZ
         plt.savefig(
@@ -233,7 +236,7 @@ def plot_calibration_diff(
     )
 
     plt.grid(True)
-    plt.axis("equal")
+    #plt.axis("equal")
     if save_path is not None: # save the plot //15AUG YZ
         plt.savefig(
             save_path,

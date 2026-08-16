@@ -87,7 +87,7 @@ def plot_resonance_fit(
         label="Lorentzian fit"
     )
 
-
+    plt.yscale("log") # log scale on y axis //16AUG YZ
 
     # resonance frequency
 
@@ -127,6 +127,7 @@ def plot_resonance_fit(
         )
 
     plt.show()
+    plt.close( )
 
     
 
@@ -230,6 +231,7 @@ def plot_phase_summary(
 
         )
     plt.show()
+    plt.close()
    
 
 # plot the sweep result has been move from main.ipynb to plotting.py //15AUG YZ
@@ -317,9 +319,10 @@ def plot_sweep(
 
         # Exact intersection
         if d1 == 0:
-
+            
             f_cross = frequency[i]
             r_cross = amplitude_0[i]
+            print(f_cross,"'",r_cross)# new intersection will be printed 16AUG YZ// amplitudes are in float, equal floats are difficult to be met. 16AUG YZ
 
             intx_freqs.append(
                 f_cross
@@ -328,6 +331,7 @@ def plot_sweep(
             intx_amps.append(
                 r_cross
             )
+           
 
         # Intersection between neighboring points
         elif d1 * d2 < 0:
@@ -363,6 +367,7 @@ def plot_sweep(
             r_cross = (
                 r0_cross + r1_cross
             ) / 2
+            print(f_cross,"'",r_cross)# new intersection will be printed 16AUG YZ
 
             intx_freqs.append(
                 f_cross
@@ -564,6 +569,8 @@ def plot_sweep(
         label="Demod 1"
     )
 
+    plt.yscale("log") # log scale for Y axis //16AUG YZ 
+
 # find intersections
 
     difference = amplitude_0 - amplitude_1
@@ -619,7 +626,7 @@ def plot_sweep(
                     - amplitude_1[i]
                 )
             )
-
+            
             # Average the two amplitudes
             r_cross = (
                 r0_cross + r1_cross
@@ -632,6 +639,7 @@ def plot_sweep(
             intx_amps.append(
                 r_cross
             )
+            print(f_cross,",", r_cross)
 
 # pop out top 3 intersections
     intx = list(
