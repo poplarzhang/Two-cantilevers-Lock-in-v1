@@ -1,12 +1,3 @@
-"""
-dataio.py
-
-Functions for saving and loading experiment data.
-
-This module is responsible only for file input/output.
-No instrument control or data analysis should be placed here.
-"""
-
 import os
 from datetime import datetime
 import json

@@ -131,7 +131,7 @@ def plot_resonance_fit(
 
     
 
-def plot_measurement_summary(
+def plot_amplitude_summary( # amplitude changed from measurements //18AUG YZ
     summary,
     save_path = None # add saving feature //15AUG YZ
 ):
@@ -142,7 +142,7 @@ def plot_measurement_summary(
 
 
     plt.plot(
-        summary["number"],
+        summary["angle"],#["number"], //18AUG YZ
         summary["r_0"],
         'o-',
         label="Demod 0"
@@ -150,7 +150,7 @@ def plot_measurement_summary(
 
 
     plt.plot(
-        summary["number"],
+        summary["angle"],#["number"], //18AUG YZ
         summary["r_1"],
         'o-',
         label="Demod 1"
@@ -158,7 +158,7 @@ def plot_measurement_summary(
 
 
     plt.xlabel(
-        "Measurement number"
+        "Measurement angle"# change number to angel //18AUG YZ
     )
 
     plt.ylabel(
@@ -192,21 +192,21 @@ def plot_phase_summary(
     )
 
     plt.plot(
-        summary["number"],
+        summary["angle"],#["number"], change number to angel //18AUG YZ
         summary["phase_0"],
         'o-',
         label="Phase 0"
     )
 
     plt.plot(
-        summary["number"],
+        summary["angle"],#["number"],
         summary["phase_1"],
         'o-',
         label="Phase 1"
     )
 
     plt.xlabel(
-        "Measurement number"
+        "Measurement angle" #change number to angel //18AUG YZ
     )
 
     plt.ylabel(
@@ -233,6 +233,108 @@ def plot_phase_summary(
     plt.show()
     plt.close()
    
+
+
+#### add new plotting of in-phase and quadrature components #### //18AUG YZ
+def plot_xcomp_summary(
+    summary,
+    save_path = None 
+):
+
+    plt.figure(
+        figsize=(9,5)
+    )
+
+    plt.plot(
+        summary["angle"],
+        summary["x_0"],
+        'o-',
+        label="cantilever 1 in-phase"
+    )
+
+    plt.plot(
+        summary["angle"],
+        summary["x_1"],
+        'o-',
+        label="cantilever 2 in-phase"
+    )
+
+    plt.xlabel(
+        "Measurement angle" 
+    )
+
+    plt.ylabel(
+        "Phase"
+    )
+
+    plt.title(
+       f"Cantilever in-phase evolution\n{timestamp}" 
+    )
+
+
+    plt.grid()
+    plt.legend()
+
+    if save_path is not None: 
+        plt.savefig(
+            save_path,
+            dpi=300,
+            bbox_inches="tight"
+
+        )
+    plt.show()
+    plt.close()
+
+
+def plot_ycomp_summary(
+    summary,
+    save_path = None 
+):
+
+    plt.figure(
+        figsize=(9,5)
+    )
+
+    plt.plot(
+        summary["angle"],
+        summary["y_0"],
+        'o-',
+        label="cantilever 1 quadrature"
+    )
+
+    plt.plot(
+        summary["angle"],
+        summary["y_1"],
+        'o-',
+        label="cantilever 2 quadrature"
+    )
+
+    plt.xlabel(
+        "Measurement angle" 
+    )
+
+    plt.ylabel(
+        "Phase"
+    )
+
+    plt.title(
+       f"Cantilever quadrature evolution\n{timestamp}" 
+    )
+
+
+    plt.grid()
+    plt.legend()
+
+    if save_path is not None: #save to a given path from external calling for //15AUG YZ
+        plt.savefig(
+            save_path,
+            dpi=300,
+            bbox_inches="tight"
+
+        )
+    plt.show()
+    plt.close()
+
 
 # plot the sweep result has been move from main.ipynb to plotting.py //15AUG YZ
 
