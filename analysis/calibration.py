@@ -2,197 +2,101 @@
 # Apply two cantilevers
 
 import os
+from pathlib import Path
 import numpy as np
 from datetime import datetime
 
+# import the summary.csv to build calibration //19AUG YZ
 
-# =====================================================
-# Calculate mean complex response of one measurement // one meansurement means one round of measurement
-# =====================================================
-
-def calculate_complex_point(measurement):
-    """
-    Calculate:
-
-        Zr = (x0 + j*y0) / (x1 + j*y1) //Zr changed from Z
-
-    using all recorded samples.
-
-    Returns:
-        mean complex value
-    """
-
-
-    x0 = np.asarray(
-        measurement["x_0"]
+###################################commented for test 19AUG YZ ###################################################
+def build_calibration_from_csv(experiment_folder):
+    filename = os.path.join(experiment_folder, "summary.csv")
+# load summary.csv
+    data = np.genfromtxt(
+        filename,
+        delimiter=",",
+        names=True
     )
 
-    y0 = np.asarray(
-        measurement["y_0"]
-    )
+# read values
 
+    angles = data["angle"]
 
-    x1 = np.asarray(
-        measurement["x_1"]
-    )
+    x0 = data["x_0"]
+    y0 = data["y_0"]
 
-    y1 = np.asarray(
-        measurement["y_1"]
-    )
+    x1 = data["x_1"]
+    y1 = data["y_1"]
 
+    r0 = data["r_0"]
+    r1 = data["r_1"]
 
-    z0 = x0 + 1j * y0
+    phase0 = data["phase_0"]
+    phase1 = data["phase_1"]
 
-    z1 = x1 + 1j * y1
+# create calibration results
 
-    # zr = mean(z0) / mean(z1) # ratio //11AUG YZ 
-    # zd = mean(z0) - mean(z1) # difference //12AUG YZ
+    z0 = x0 + 1j * y0 # x0, x1, y0, y1 are mean values at different angles already //19AUG YZ
+    z1 = x1 + 1j * y1 # create a mean complex number //19AUG YZ
 
-    # return np.mean(z0) 
-    # the upper line is changed to the next line to return 3 mean values of mean(z0), mean(z1), and zr=mean(z0)/mean(z1) //11AUG YZ
-    # return np.mean(z0), np.mean(z1), (np.mean(z0))/(np.mean(z1)) #11AUG YZ
-    # return adds the difference // 12AUG YZ
-    return np.mean(z0), np.mean(z1), (np.mean(z0)) / (np.mean(z1)), (np.mean(z0))-(np.mean(z1)), np.mean(np.abs(z0)) / np.mean(np.abs(z1))# //12AUG YZ
-# return adds np.mean(np.abs(z0)) / np.mean(np.abs(z1)) //14AUG YZ
-
-# =====================================================
-# Build calibration from folder
-# =====================================================
-
-def build_calibration(folder):
    
-    angles = []
-    z0_means = [] #store z0_mean values for cantilever 1 //11AUG YZ
-    z1_means = [] #store z1_mean values for cantilever 2 //11AUG YZ
-    ratio_points = [] #store ratio of z0_mean/z2_mean, nothing changed, comments for clarficatin //14AUG YZ
-    diff_points = [] #store difference between cantilever 1 and cantilever 2//12AUG YZ
-    r_m_mags = [] #store the ratio of the mean magnitude of z0 to that of z1 //14AUG YZ
-    source_files = []
+    ratio_points = z0 / z1
+    diff_points = z0 - z1
 
+    ratio_mean_mag = r0 / r1 # r0 and r1 are mean of magnitudes at one angle, mean(abs(cantilever output))
+    
+    mag_mean_z0 = abs(z0)
+    mag_mean_z1 = abs(z1)
 
-
-    # files = sorted(
-    #     os.listdir(folder)
-    # )
-    # npy_files = [
-    #     f for f in files
-    #     if f.endswith(".npy")
-    # ] # check if file type is correct
-
-
-    # print(
-    #     "Found",
-    #     len(npy_files),
-    #     "measurement files"
-    # )
-    files = sorted(
-    os.listdir(folder)
-)
-
-    npy_files = [
-        f for f in files
-        if f.endswith(".npy")
-        and f != "calibration.npy"
-    ]
-
-    print(
-        "Found",
-        len(npy_files),
-        "measurement files"
-    )
-
-
-
-    for filename in npy_files:
-
-
-        filepath = os.path.join(
-            folder,
-            filename
-        )
-
-
-        measurement = np.load(
-            filepath,
-            allow_pickle=True
-        ).item()
-
-        # -----------------------------
-        # Read angle from metadata
-        # -----------------------------
-
-        angle = (
-            measurement["metadata"]
-            ["experiment_angle"]
-        )
-
-        # -----------------------------
-        # Calculate mean complex point
-        # -----------------------------
-        # commented to take mean(z0)/mean(z1) for calibration, begins //11AUG YZ
-        # z = calculate_complex_point(measurement)
-        # commented to take man(z0)/mean(z1)) for calibration, ends //11AUG YZ
-        z0_mean, z1_mean, zr_mean, zd_mean, zm_mean = calculate_complex_point(measurement) 
-        #zr_mean = mean(z0)/mean(z1) //11AUG YZ
-        #zd_mean = mean(z0)-mean(z1) //12AUG YZ
-        #zm_mean = mean(abs(z0))/mean(abs(z1)) //14AUG YZ
-
-        # code sorted, and z0_means, z1_means are added //11AUG YZ 
-        #np.mean(np.abs(z0)) / np.mean(np.abs(z1)) added //14AUG YZ
-        angles.append(angle)
-
-        z0_means.append(z0_mean)
-        z1_means.append(z1_mean)        
-        ratio_points.append(zr_mean)
-        diff_points.append(zd_mean)
-        r_m_mags.append(zm_mean) #Mean(|z0|) / Mean(|z1|), ratio of mean of magnitude //14AUG YZ
-
-
-        source_files.append(filename)
-
-
-
-        print(
-            f"{filename}: angle={angle:.1f}° | "
-            f"z0={z0_mean:.4f} | "
-            f"z1={z1_mean:.4f} | "
-            f"zr={zr_mean:.4f} | "
-            f"zd={zd_mean:.4f} | "
-            f"zm={zm_mean:.4f}"
-        )
-
-
-
-    calibration = {
+    calibration_from_summary= {
 
         "angles":
             np.array(angles),
-        # calibration takes the mean values of two cantilevers for plotting begins //11AUG YZ    
+
         "Cantilever 1":
-            np.array(z0_means),
+            np.array(z0),
+
         "Cantilever 2":
-            np.array(z1_means),
-        # calibration takes the mean values of two cantilevers for plotting ends //11AUG YZ   
+            np.array(z1),
+
         "ratio_points":
             np.array(ratio_points),
-        # calibration  takes the ratio of two cantilevers for plotting 
+
         "diff_points":
             np.array(diff_points),
-        # calibration takes the difference of mean values of two cantileverss for plotting //12AUG YZ
+
         "ratio_mean_mag":
-            np.array(r_m_mags),
-        # calibration takes the ratio of mean magnitude of two cantilevers for plotting //14AUG YZ
+            np.array(ratio_mean_mag),
+
+        "r_0":
+            np.array(r0),
+
+        "r_1":
+            np.array(r1),
+
+        "phase_0":
+            np.array(phase0),
+
+        "phase_1":
+            np.array(phase1),
+        "norm_diff":
+            np.array(diff_points/(mag_mean_z0+mag_mean_z1)),
         "source_files":
-            source_files,
+            [Path(filename).resolve()],
+
         "created":
             datetime.now().isoformat()
     }
+
     print()
+    print("Calibration built from CSV")
+    print(f"Source: {filename}")
+    print(f"Number of angles: {len(angles)}")
+    print(calibration_from_summary)
     print("71 67 77 89")
     print("=-=-=-=-=-=")
-    print("calibration built")
-    return calibration
 
+    return calibration_from_summary
 
 
 # =====================================================

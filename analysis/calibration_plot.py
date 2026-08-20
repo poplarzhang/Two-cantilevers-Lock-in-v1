@@ -101,7 +101,7 @@ def plot_calibration_cantilevers(
         "o-",
         color="#1f77b4",
         markersize=4,
-        linewidth=1
+        linewidth=0.5
     )
 
     for i, angle in enumerate(angles):
@@ -149,7 +149,7 @@ def plot_calibration_cantilevers(
         "o-",
         color="#ff7f0e",
         markersize=4,
-        linewidth=1
+        linewidth=0.5
     )
 
     for i, angle in enumerate(angles):
@@ -207,7 +207,7 @@ def plot_calibration_diff(
         x,
         y,
         c=angles,
-        cmap="viridis",
+        cmap="hsv",
         s=10 # changed from 60 //11AUG YZ
     )
 
@@ -217,7 +217,7 @@ def plot_calibration_diff(
             x[i],
             y[i],
             f"{angle:.0f}°",
-            fontsize =6
+            fontsize = 6
         )
 
     plt.xlabel("Real(Zd)")
@@ -303,3 +303,113 @@ def plot_calibration_rmmag(
     plt.show()
     plt.close()
 # plot ratio of two cantilevers mean magnitude by angle ends //14AUG YZ
+
+# plot normalized difference (mean(z0)-mean(z1))/(abs(mean(z0))+abs(mean(z1)))
+def plot_calibration_norm_diff(
+        calibration,
+        save_path = None
+):
+    fig, ax = plt.subplots(
+        figsize=(7,6) #(10, 9) change to (7,6) //20AUG YZ
+    )
+    ND_cal = calibration["norm_diff"]
+    angles_cal = calibration ["angles"]
+
+    sc = ax.scatter(
+        ND_cal.real,
+        ND_cal.imag,
+        c=angles_cal,
+        cmap="hsv",
+        s=10,
+        zorder=3
+    )
+
+    ax.plot(
+        ND_cal.real,
+        ND_cal.imag,
+        color="black",
+        linewidth=0.5,
+        alpha=0.25
+    )
+
+
+
+    for angle in np.arange(0, 360, 10):
+
+        idx = np.argmin(
+            np.abs(
+                angles_cal - angle
+            )
+    )
+
+        if np.isfinite(
+        ND_cal[idx].real
+        ):
+
+            ax.annotate(
+                f"{angle:+.0f}°",
+                (
+                    ND_cal[idx].real,
+                    ND_cal[idx].imag
+                ),
+                xytext=(4, 4),
+                textcoords="offset points",
+                fontsize=6,
+                bbox=dict(
+                    boxstyle="round,pad=0.15",
+                    fc="white",
+                    ec="none",
+                    alpha=0.65
+                )
+            )
+
+
+    ax.axhline(
+        0,
+        color="gray",
+        alpha=0.4
+    )
+
+    ax.axvline(
+        0,
+        color="gray",
+        alpha=0.4
+    )
+
+    ax.set_aspect(
+        "equal",
+        adjustable="box"
+    )
+
+    ax.set_xlabel(
+        "Re(ND)"
+    )
+
+    ax.set_ylabel(
+        "Im(ND)"
+    )
+
+    ax.set_title(
+        f"Norm_diff - ({timestamp})",
+        
+    )
+
+    ax.grid(alpha=0.3)
+
+    plt.colorbar(
+        sc,
+        ax=ax,
+        label="Direction (degrees)"
+    )
+
+    plt.tight_layout()
+    if save_path is not None: 
+            plt.savefig(
+                save_path,
+                dpi=300,
+                bbox_inches="tight"
+            )
+
+    plt.show()
+    plt.close()
+    

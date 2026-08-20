@@ -264,7 +264,7 @@ def plot_xcomp_summary(
     )
 
     plt.ylabel(
-        "Phase"
+        "in-Phase component"
     )
 
     plt.title(
@@ -314,7 +314,7 @@ def plot_ycomp_summary(
     )
 
     plt.ylabel(
-        "Phase"
+        "quadrature component"
     )
 
     plt.title(
