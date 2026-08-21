@@ -17,34 +17,12 @@ def plot_resonance_fit(
     title= None
     
 ):
-    
-    
-    """
-    Plot measured data and fitted Lorentzian.
-
-    Parameters
-    ----------
-    frequency :
-        frequency array
-
-    amplitude :
-        measured amplitude
-
-    fit_result :
-        dictionary returned by fit_resonance()
-
-    """
-
-
 
     parameters = fit_result["parameters"]
-
 
     f0 = fit_result["f0"]
 
     Q = fit_result["Q"]
-
-
 
     # Smooth frequency axis for fitted curve
 
@@ -54,19 +32,14 @@ def plot_resonance_fit(
         1000
     )
 
-
-
     amplitude_fit = lorentzian(
         frequency_fit,
         *parameters
     )
 
-
-
     plt.figure(
         figsize=(9,5)
     )
-
 
     # measured data
 
@@ -76,7 +49,6 @@ def plot_resonance_fit(
         "o",
         label="Measurement"
     )
-
 
     # fitted curve
 
@@ -98,22 +70,17 @@ def plot_resonance_fit(
         label=f"f0 = {f0:.2f} Hz"
     )
 
-
-
     plt.xlabel(
         "Frequency (Hz)"
     )
-
 
     plt.ylabel(
         "Amplitude R"
     )
 
-
     plt.title(
         f"{title}\nQ = {Q:.1f}"
     )
-
 
     plt.grid()
     plt.legend()
@@ -128,7 +95,6 @@ def plot_resonance_fit(
 
     plt.show()
     plt.close( )
-
     
 
 def plot_amplitude_summary( # amplitude changed from measurements //18AUG YZ
@@ -140,7 +106,6 @@ def plot_amplitude_summary( # amplitude changed from measurements //18AUG YZ
         figsize=(9,5)
     )
 
-
     plt.plot(
         summary["angle"],#["number"], //18AUG YZ
         summary["r_0"],
@@ -148,14 +113,12 @@ def plot_amplitude_summary( # amplitude changed from measurements //18AUG YZ
         label="Demod 0"
     )
 
-
     plt.plot(
         summary["angle"],#["number"], //18AUG YZ
         summary["r_1"],
         'o-',
         label="Demod 1"
     )
-
 
     plt.xlabel(
         "Measurement angle"# change number to angel //18AUG YZ
@@ -180,6 +143,7 @@ def plot_amplitude_summary( # amplitude changed from measurements //18AUG YZ
         )
 
     plt.show()
+    plt.close()
 
 
 def plot_phase_summary(
@@ -219,7 +183,6 @@ def plot_phase_summary(
         f"Cantilever phase evolution\n{timestamp}" #timestamp added //11AUG YZ        
     )
 
-
     plt.grid()
     plt.legend()
 
@@ -228,8 +191,8 @@ def plot_phase_summary(
             save_path,
             dpi=300,
             bbox_inches="tight"
-
         )
+
     plt.show()
     plt.close()
    
@@ -280,8 +243,8 @@ def plot_xcomp_summary(
             save_path,
             dpi=300,
             bbox_inches="tight"
-
         )
+
     plt.show()
     plt.close()
 
@@ -330,8 +293,8 @@ def plot_ycomp_summary(
             save_path,
             dpi=300,
             bbox_inches="tight"
-
         )
+
     plt.show()
     plt.close()
 
@@ -347,33 +310,7 @@ def plot_sweep(
     timestamp=None, # timestampe as the 1st cell in main.ipynt
     save_path=None # file path to save
 ):
-    """
-    Plot sweep result for two cantilevers.
-
-    Parameters
-    ----------
-    frequency : array-like
-        Frequency array.
-
-    amplitude_0 : array-like
-        Amplitude of demodulator 0.
-
-    amplitude_1 : array-like
-        Amplitude of demodulator 1.
-
-    fit_0 : dict
-        Resonance fitting result for demodulator 0.
-
-    fit_1 : dict
-        Resonance fitting result for demodulator 1.
-
-    timestamp : str, optional
-        Timestamp shown in the plot title.
-
-    save_path : str, optional
-        Path where the plot will be saved.
-    """
-
+    
     # =====================================================
     # Amplitude at fitted resonance frequencies
     # =====================================================
@@ -611,9 +548,7 @@ def plot_sweep(
         )
 
     plt.grid()
-
     plt.legend()
-
     plt.tight_layout()
 
 # save plot
@@ -895,10 +830,7 @@ def plot_sweep(
             bbox_inches="tight"
         )
 
-
-
     plt.show()
     plt.close()
-
 
 # commentted the plotting of ratio since not used and has been moved to calibration_plot.py //15AUG YZ

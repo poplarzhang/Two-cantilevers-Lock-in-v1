@@ -52,38 +52,29 @@ def build_calibration_from_csv(experiment_folder):
 
         "angles":
             np.array(angles),
-
         "Cantilever 1":
             np.array(z0),
-
         "Cantilever 2":
             np.array(z1),
-
         "ratio_points":
             np.array(ratio_points),
-
         "diff_points":
             np.array(diff_points),
-
         "ratio_mean_mag":
             np.array(ratio_mean_mag),
-
         "r_0":
             np.array(r0),
-
         "r_1":
             np.array(r1),
-
         "phase_0":
             np.array(phase0),
-
         "phase_1":
             np.array(phase1),
         "norm_diff":
             np.array(diff_points/(mag_mean_z0+mag_mean_z1)),
+
         "source_files":
             [Path(filename).resolve()],
-
         "created":
             datetime.now().isoformat()
     }
@@ -150,149 +141,3 @@ def load_calibration(
     ).item()
 
 
-
-# =====================================================
-# Estimate unknown angle
-# =====================================================
-
-def estimate_angle(
-    measurement,
-    calibration
-):
-    """
-    Estimate angle of an unknown measurement.
-
-    Method:
-        1. Calculate mean complex response
-        2. Compare with calibration points
-        3. Return closest angle
-
-    """
-
-    z_unknown = calculate_complex_point(
-        measurement
-    )
-
-
-    calibration_points = (
-        calibration["complex_points"]
-    )
-
-    angles = (
-        calibration["angles"]
-    )
-
-
-    distances = np.abs(
-        calibration_points - z_unknown
-    )
-
-
-    index = np.argmin(
-        distances
-    )
-
-
-    estimated_angle = angles[index]
-
-
-    return {
-        "angle": estimated_angle,
-        "complex_point": z_unknown,
-        "distance": distances[index]
-    }
-
-# =====================================================
-# Estimate unknown angle with interpolation
-# =====================================================
-
-def estimate_angle_interpolated(
-    measurement,
-    calibration
-):
-    """
-    Estimate angle using linear interpolation
-    between calibration points in the complex plane.
-    """
-
-    z_unknown = calculate_complex_point(
-        measurement
-    )
-
-    points = calibration["complex_points"]
-    angles = calibration["angles"]
-
-
-    best_distance = np.inf
-    best_angle = None
-
-
-    # Check every segment between calibration points
-
-    for i in range(len(points)-1):
-
-        z1 = points[i]
-        z2 = points[i+1]
-
-        a1 = angles[i]
-        a2 = angles[i+1]
-
-
-        # Vector along calibration curve
-
-        dz = z2 - z1
-
-
-        if dz == 0:
-            continue
-
-
-        # Projection of unknown point onto segment
-
-        t = np.real(
-            (z_unknown - z1)
-            * np.conj(dz)
-        ) / (
-            np.abs(dz)**2
-        )
-
-
-        # Limit to this segment
-
-        t_clipped = np.clip(
-            t,
-            0,
-            1
-        )
-
-
-        z_projection = (
-            z1
-            +
-            t_clipped * dz
-        )
-
-
-        distance = abs(
-            z_unknown - z_projection
-        )
-
-
-        if distance < best_distance:
-
-            best_distance = distance
-
-            best_angle = (
-                a1
-                +
-                t_clipped
-                *
-                (a2 - a1)
-            )
-
-
-    return {
-        "angle": best_angle,
-        "complex_point": z_unknown,
-        "distance": best_distance
-    }

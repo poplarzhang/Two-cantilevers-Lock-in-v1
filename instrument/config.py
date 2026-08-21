@@ -81,7 +81,7 @@ OFFSET = 0
 #
 # Units: Volt
 #
-AMPLITUDE = 0.005
+AMPLITUDE = 0.01
 
 
 

@@ -1,5 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+
 from datetime import datetime # added for enabling timestamp in the plot title //11AUG YZ
 import os
 
@@ -71,7 +73,8 @@ def plot_calibration(
         )
 
     plt.show()
-    plt.close()    
+    plt.close()
+    print("calibration by ratio of mean of responses plotted and saved", timestamp)    
 
 
 # plot two cantilevers mean values by angle begins //11AUG YZ
@@ -184,6 +187,7 @@ def plot_calibration_cantilevers(
         
     plt.show()
     plt.close() 
+    print("calibration by cantilevers complex responses plotted and saved", timestamp)
 # plot two cantilevers mean values by angle ends //11AUG YZ
 
 # plot two cantilevers mean values difference by angle begins //12AUG YZ
@@ -246,6 +250,7 @@ def plot_calibration_diff(
 
     plt.show()
     plt.close()
+    print("calibration by difference of cantilever plotted and saved", timestamp)
 
 # plot two cantilevers mean values difference by angle ends //12AUG YZ
 
@@ -302,6 +307,7 @@ def plot_calibration_rmmag(
 
     plt.show()
     plt.close()
+    print("calibration by ration of mean magnitude plotted and saved", timestamp)
 # plot ratio of two cantilevers mean magnitude by angle ends //14AUG YZ
 
 # plot normalized difference (mean(z0)-mean(z1))/(abs(mean(z0))+abs(mean(z1)))
@@ -412,4 +418,263 @@ def plot_calibration_norm_diff(
 
     plt.show()
     plt.close()
+    print("calibration by norm_diff plotted and saved", timestamp)
+
+# plot the AUE orignal and estimation //20AUG YZ
+def plot_loc_est(
+        norm_diff_point_loc, # normalized difference of interested point //21AUG YZ
+        AUE_LDND,   # estimation by the least difference of normalized difference between the in interested point and calibration //21AUG YZ
+        calib_filepath, # given calibration
+        save_path # auto save plot
+):
+# load calibration.npy
+    calibration = np.load(
+        calib_filepath,
+        allow_pickle=True
+    ).item()
+
+    ND_cal = calibration["norm_diff"]
+    angles_cal = calibration["angles"]
+
+# read the interested point and convert to magnitude //21AUG YZ
+
+    if isinstance(norm_diff_point_loc, np.ndarray):
+        z_point = norm_diff_point_loc[0]
+    else:
+        z_point = norm_diff_point_loc
+
+    x_point = z_point.real
+    y_point = z_point.imag
+
+    r = abs(z_point)
+
+# initialize the plot
+    fig, ax = plt.subplots(
+        figsize=(7, 6)
+    )
+
+# plotting calibration
+    sc = ax.scatter(
+        ND_cal.real,
+        ND_cal.imag,
+        c=angles_cal,
+        cmap="hsv",
+        s=10,
+        zorder=3
+    )
+
+# Calibration point labels //21AUG YZ
+    for z_cal, angle in zip(ND_cal, angles_cal):
+
+        ax.annotate(
+            f"{angle:+.0f}°",
+            (
+                z_cal.real,
+                z_cal.imag
+            ),
+            xytext=(4, 4),
+            textcoords="offset points",
+            fontsize=6,
+            bbox=dict(
+                boxstyle="round,pad=0.15",
+                fc="white",
+                ec="none",
+                alpha=0.65
+            )
+        )
+
+# circle by the interested point's magnitude //21AUG YZ
+
+    theta = np.linspace(
+        0,
+        2 * np.pi,
+        500
+    )
+
+    circle_x = r * np.cos(theta)
+    circle_y = r * np.sin(theta)
+
+    ax.plot(
+        circle_x,
+        circle_y,
+        color="gray",
+        linewidth=0.8,
+        linestyle="--",
+        alpha=0.35,
+        zorder=1
+    )
+
+    marker_angles_deg = np.arange(
+        0,
+        360,
+        10
+    )
+
+    marker_angles_rad = np.deg2rad(
+        marker_angles_deg
+    )
+
+    marker_x = r * np.cos(marker_angles_rad)
+    marker_y = r * np.sin(marker_angles_rad)
+
+    ax.scatter(
+        marker_x,
+        marker_y,
+        marker="x",
+        color="gray",
+        s=35,
+        linewidths=1.2,
+        alpha=0.35,
+        zorder=2
+    )
+
+# plot the unknown point on the plane by a red X //21AUG YZ
+    ax.scatter(
+        x_point,
+        y_point,
+        marker="x",
+        color="red",
+        s=100,
+        linewidths=2.5,
+        zorder=6
+    )
+
+# mark the 3 possible resulf from AUE_LDND
+    markers = [
+        "o",
+        "s",
+        "^"
+    ]
+    markers_color = [
+        "green",
+        "yellow",
+        "orange"
+    ]
+
+    for result, marker, color in zip(
+        AUE_LDND,
+        markers,
+        markers_color
+    ):
+
+        z_cal = result["calibration_point"]
+
+        ax.scatter(
+            z_cal.real,
+            z_cal.imag,
+            marker=marker,
+            facecolors="none",
+            edgecolors=color,
+            s=50,
+            linewidths=1.5,
+            zorder=7
+        )
+
+# axis, title
+    ax.axhline(
+        0,
+        color="gray",
+        alpha=0.4
+    )
+
+    ax.axvline(
+        0,
+        color="gray",
+        alpha=0.4
+    )
+
+    ax.set_aspect(
+        "equal",
+        adjustable="box"
+    )
+
+    ax.set_xlabel(
+        "Re(ND)"
+    )
+
+    ax.set_ylabel(
+        "Im(ND)"
+    )
+
+    ax.set_title(
+        f"Norm_diff - ({timestamp})"
+    )
+
+    ax.grid(
+        alpha=0.3
+    )
+
+
+    cbar = plt.colorbar(
+        sc,
+        ax=ax,
+        label="Direction (degrees)"
+    )
+
+# show legends
+    legend_handles = [
+
+        Line2D(
+            [0], [0],
+            marker="x",
+            color="red",
+            linestyle="None",
+            markersize=8,
+            markeredgewidth=2,
+            label="Unknown point"
+        ),
+
+        Line2D(
+            [0], [0],
+            marker="o",
+            color="green",
+            markerfacecolor="none",
+            linestyle="None",
+            markersize=7,
+            label=f"{AUE_LDND[0]['angle']:+.0f}° - 1st closest"
+        ),
+
+        Line2D(
+            [0], [0],
+            marker="s",
+            color="yellow",
+            markerfacecolor="none",
+            linestyle="None",
+            markersize=7,
+            label=f"{AUE_LDND[1]['angle']:+.0f}° - 2nd closest"
+        ),
+
+        Line2D(
+            [0], [0],
+            marker="^",
+            color="orange",
+            markerfacecolor="none",
+            linestyle="None",
+            markersize=7,
+            label=f"{AUE_LDND[2]['angle']:+.0f}° - 3rd closest"
+        )
+    ]
+
+    legend = ax.legend(
+        handles=legend_handles,
+        loc="upper right",
+        bbox_to_anchor=(-0.15, 1.08),
+        fontsize=6,
+        frameon=True
+    )
+    legend.set_in_layout(False)
+
+    plt.tight_layout()
+
+# save
+    plt.savefig(
+        save_path,
+        dpi=300,
+        bbox_inches="tight"
+    )
+
+    plt.show()
+    plt.close()
+
+    print("estimation plotted and saved",timestamp)
     
