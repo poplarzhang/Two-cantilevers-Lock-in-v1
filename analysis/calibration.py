@@ -17,7 +17,9 @@ def build_calibration_from_csv(experiment_folder):
         delimiter=",",
         names=True
     )
-
+    summary_timestamp = datetime.fromtimestamp(
+        os.path.getctime(filename)
+    ).isoformat()
 # read values
 
     angles = data["angle"]
@@ -76,7 +78,7 @@ def build_calibration_from_csv(experiment_folder):
         "source_files":
             [Path(filename).resolve()],
         "created":
-            datetime.now().isoformat()
+            summary_timestamp #datetime.now().isoformat()
     }
 
     print()

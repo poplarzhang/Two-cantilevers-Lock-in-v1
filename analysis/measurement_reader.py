@@ -1,5 +1,7 @@
 import os
 import numpy as np
+import json
+
 def load_measurements(folder):
 
    # read all the calibration files by degree, if a calibration.npy exists already, it would be screened out //18AUG YZ
@@ -8,7 +10,8 @@ def load_measurements(folder):
     [
         f for f in os.listdir(folder)
         if f.lower().endswith(".npy")
-        and f.lower() != "calibration.npy"
+        and "calibration" not in f.lower()
+        and "aue" not in f.lower()
     ]
 )
     measurements = []
@@ -31,11 +34,11 @@ def load_measurements(folder):
             data
         )
 
-        print(
-            "Loaded:",
-            filename
-        )
-        print(measurements[-1]) #print the last added item //18AUG YZ
+        # print(
+        #     "Loaded:",
+        #     filename
+        # )
+        # print(measurements[-1]) #print the last added item //18AUG YZ
         
     return measurements
 
@@ -122,3 +125,31 @@ def summarize_measurements(measurements):
 
 
     return summary
+
+def fit_load(experiment_folder):
+
+    fit0_file = os.path.join(
+        experiment_folder,
+        "fit_demod0.json"
+    )
+
+    fit1_file = os.path.join(
+        experiment_folder,
+        "fit_demod1.json"
+    )
+
+    with open(fit0_file, "r") as f:
+        fit0 = json.load(f)
+
+    with open(fit1_file, "r") as f:
+        fit1 = json.load(f)
+
+    print()
+    print("Fit demod 0:")
+    print(fit0)
+
+    print()
+    print("Fit demod 1:")
+    print(fit1)
+
+    return fit0, fit1

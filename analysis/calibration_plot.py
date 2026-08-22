@@ -14,8 +14,8 @@ def plot_calibration(
     ): #plot cantilever 1 / cantilever 2 //15AUG YZ
    
     angles = calibration["angles"]
-
     points = calibration["ratio_points"]
+    calib_timestamp = calibration ["created"][:19].replace("T"," - ")
 
     x = np.real(points)
 
@@ -51,7 +51,7 @@ def plot_calibration(
 
     plt.title(
         # f"Calibration map"{}
-        f"Cantilever ratio - ({timestamp})" # timestamp added //11AUG YZ 
+        f"ratio of calibration - ({calib_timestamp})" # timestamp added //11AUG YZ 
         #//13AUG Cantilever ratio changed from calibration map
         
     )
@@ -87,9 +87,9 @@ def plot_calibration_cantilevers(
 
 
     angles = calibration["angles"]
-
     z0_means = calibration["Cantilever 1"]
     z1_means = calibration["Cantilever 2"]
+    calib_timestamp = calibration ["created"][:19].replace("T"," - ")
 
 # cantilever 1 takes z0_means //11AUG YZ
 
@@ -121,7 +121,7 @@ def plot_calibration_cantilevers(
     plt.ylabel("Imaginary(Z0)")
 
     plt.title(
-        f"Cantilever 1 - ({timestamp})"
+        f"CL1 of calibration - ({calib_timestamp})"
     )
 
     plt.grid(True)
@@ -171,7 +171,7 @@ def plot_calibration_cantilevers(
     )
 
     plt.title(
-        f"Cantilever 2 - ({timestamp})"
+        f"CL2 of calibration - ({calib_timestamp})"
     )
 
     plt.grid(True)
@@ -198,8 +198,9 @@ def plot_calibration_diff(
     ):
 
     angles = calibration["angles"]
-
     points = calibration["diff_points"]
+    calib_timestamp = calibration ["created"][:19].replace("T"," - ")
+
 
     x = np.real(points)
 
@@ -230,7 +231,7 @@ def plot_calibration_diff(
 
     plt.title(
        
-        f"Cantilever diff - ({timestamp})" 
+        f"diff of calibration- ({calib_timestamp})" 
         
     )
 
@@ -263,10 +264,10 @@ def plot_calibration_rmmag(
     angles = np.asarray(
         calibration["angles"]
     )
-
     zm_mean = np.asarray(
         calibration["ratio_mean_mag"]
     )
+    calib_timestamp = calibration ["created"][:19].replace("T"," - ")
 
     plt.figure(figsize=(7, 6))
 
@@ -291,7 +292,7 @@ def plot_calibration_rmmag(
     plt.ylabel("Ratio of Mean(|z0|) / Mean(|z1|)")
 
     plt.title(
-        f"Cantilever ratio_mag - ({timestamp})"
+        f"rmmage of calibration - ({calib_timestamp})"
     )
 
     plt.grid(True)
@@ -320,6 +321,7 @@ def plot_calibration_norm_diff(
     )
     ND_cal = calibration["norm_diff"]
     angles_cal = calibration ["angles"]
+    calib_timestamp = calibration ["created"][:19].replace("T"," - ")
 
     sc = ax.scatter(
         ND_cal.real,
@@ -337,8 +339,6 @@ def plot_calibration_norm_diff(
         linewidth=0.5,
         alpha=0.25
     )
-
-
 
     for angle in np.arange(0, 360, 10):
 
@@ -396,7 +396,7 @@ def plot_calibration_norm_diff(
     )
 
     ax.set_title(
-        f"Norm_diff - ({timestamp})",
+        f" norm-diff of calibration - ({calib_timestamp})",
         
     )
 
@@ -419,6 +419,8 @@ def plot_calibration_norm_diff(
     plt.show()
     plt.close()
     print("calibration by norm_diff plotted and saved", timestamp)
+    print("71 67 77 89")
+    print("=-=-=-=-=-=")
 
 # plot the AUE orignal and estimation //20AUG YZ
 def plot_loc_est(
@@ -435,6 +437,8 @@ def plot_loc_est(
 
     ND_cal = calibration["norm_diff"]
     angles_cal = calibration["angles"]
+    calib_timestamp = calibration ["created"][:19].replace("T"," - ")
+
 
 # read the interested point and convert to magnitude //21AUG YZ
 
@@ -450,7 +454,7 @@ def plot_loc_est(
 
 # initialize the plot
     fig, ax = plt.subplots(
-        figsize=(7, 6)
+        figsize=(11, 7)
     )
 
 # plotting calibration
@@ -484,7 +488,6 @@ def plot_loc_est(
         )
 
 # circle by the interested point's magnitude //21AUG YZ
-
     theta = np.linspace(
         0,
         2 * np.pi,
@@ -597,7 +600,7 @@ def plot_loc_est(
     )
 
     ax.set_title(
-        f"Norm_diff - ({timestamp})"
+        f"EST by LDND of calibration on {calib_timestamp}\n at {timestamp} "
     )
 
     ax.grid(
@@ -608,7 +611,8 @@ def plot_loc_est(
     cbar = plt.colorbar(
         sc,
         ax=ax,
-        label="Direction (degrees)"
+        label="Direction (degrees)",
+        pad = 0.03
     )
 
 # show legends
@@ -621,7 +625,7 @@ def plot_loc_est(
             linestyle="None",
             markersize=8,
             markeredgewidth=2,
-            label="Unknown point"
+            label="Unknown"
         ),
 
         Line2D(
@@ -655,15 +659,17 @@ def plot_loc_est(
         )
     ]
 
-    legend = ax.legend(
+    fig.subplots_adjust(
+        right=0.72
+    )
+    legend = fig.legend(
         handles=legend_handles,
-        loc="upper right",
-        bbox_to_anchor=(-0.15, 1.08),
+        loc="upper left",
+        bbox_to_anchor=(0.75, 0.9),
         fontsize=6,
         frameon=True
     )
-    legend.set_in_layout(False)
-
+   
     plt.tight_layout()
 
 # save
@@ -677,4 +683,6 @@ def plot_loc_est(
     plt.close()
 
     print("estimation plotted and saved",timestamp)
+    print("71 67 77 89")
+    print("=-=-=-=-=-=")
     

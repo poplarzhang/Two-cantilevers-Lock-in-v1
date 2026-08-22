@@ -1,9 +1,6 @@
 import os
-
 import numpy as np
-
 from pathlib import Path
-
 from datetime import datetime
 
 class ExperimentRunner:
@@ -125,7 +122,7 @@ class ExperimentRunner:
                 f"{number:03d}_angle_{int(experiment_angle)}.npy"
             )
         else:
-            filename = (f"{prefix}_angle_{int(experiment_angle)}.npy")
+            filename = (f"{prefix}_{int(experiment_angle)}.npy")
 
         filepath = os.path.join(
             self.run_folder,
@@ -218,7 +215,7 @@ class ExperimentRunner:
             measurement_number += 1
 
             
-    def loc_run(
+    def loc_run( # new function of localization experiment //20AUG YZ
         self,
         duration=2.0,
     ):      
@@ -254,7 +251,7 @@ class ExperimentRunner:
             prefix= "AUE" #Angle Under Estimation //20AUG YZ
         )
 
-def con_AUE( #conversion an meansurement file of the angle under estimation to a dictionary variant //20AUG YZ
+def con_AUE( #convert a meansurement file of the angle under estimation to a dictionary variant //20AUG YZ
     aue_filename
 ):
     data = np.load(
@@ -263,7 +260,7 @@ def con_AUE( #conversion an meansurement file of the angle under estimation to a
     ).item()
 # reading
     angle = data["metadata"]["experiment_angle"]
-    
+    AUE_time =data["metadata"]["timestamp"]
     x0 = np.mean(data["x_0"])
     y0 = np.mean(data["y_0"])
 
@@ -295,7 +292,6 @@ def con_AUE( #conversion an meansurement file of the angle under estimation to a
     )
 
 # generating
-
     val_for_loc = {
 
         "angle":
@@ -323,7 +319,7 @@ def con_AUE( #conversion an meansurement file of the angle under estimation to a
         "source_files":
             [Path(aue_filename).name],
         "created":
-            datetime.now().isoformat()
+            AUE_time
     }
 
     return val_for_loc   
@@ -372,5 +368,9 @@ def est_LDND(norm_diff_point_loc, calib_filepath):
             "magnitude": mag_cal[idx],
             "magnitude_diff": magnitude_diff[idx]
         })
-
+        print(
+            f"Angle: {angles_cal[idx]:+.1f}°, "
+            f"MAG: {mag_cal[idx]:.6f} - "
+            f"ABS of MAG_DIFF: {abs(magnitude_diff[idx]):.6f} \n"
+        )
     return AUE_3
