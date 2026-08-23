@@ -66,6 +66,7 @@ def summarize_measurements(measurements):
     summary = { # the summary has been changed from the sequence of calibration,
     # magnitude of cantilevers, and phase of cantilevers to new components //17AUG
         "angle": [], #"number": [], sequence number to angle
+        "created": [], # added to read calibration points created timestamp //23
         "x_0": [], #"r_0": [], CH1 magnitude to CH1 in-phase component
         "y_0": [],#"r_1": [], CH2 magnitude to CH1 quadrature component
         "x_1": [],#"phase_0": [], CH1 phase to CH2 in-phase component
@@ -82,7 +83,11 @@ def summarize_measurements(measurements):
         start=1
     ):
         summary["angle"].append(measurement["metadata"]
-        ["experiment_angle"])#summary["number"].append(i)
+            ["experiment_angle"])#summary["number"].append(i)
+        summary["created"].append(measurement["metadata"]
+            ["timestamp"][:19].replace("T", " ")
+        )
+
 
 # the following data is still taking the average from the calibration files, format is changed to: angle, x_0, y_0, x_1, y_1 //17AUG YZ
         summary["x_0"].append(# summary["r_0"].append(
