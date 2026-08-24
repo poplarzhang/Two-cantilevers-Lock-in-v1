@@ -53,11 +53,11 @@ class ExperimentRunner:
         )
 
         print()
-        print("====================================")
+        # print("====================================")
         print("Experiment folder created")
         print(self.run_folder)
-        print("====================================")
-        print()
+        # print("====================================")
+        # print()
 
         self.save_settings()
 
@@ -94,8 +94,7 @@ class ExperimentRunner:
                 for key, value in self.metadata.items():
                     file.write(f"{key}: {value}\n")
 
-        print("Settings saved.")
-        print(filename)
+        print("Settings saved.",filename)
         print()
 
     # ======================================================
@@ -115,14 +114,14 @@ class ExperimentRunner:
         Save one measurement.
         """
 
-        # safe_label = label.replace(" ", "_") remove the label input as decription //10AUG YZ
+        # save_label = label.replace(" ", "_") remove the label input as decription //10AUG YZ
         if prefix is None:
             filename = (
                 # f"{number:03d}_{safe_label}.npy" //change to show angle in filename instead of label //10AUG YZ
                 f"{number:03d}_angle_{int(experiment_angle)}.npy"
             )
         else:
-            filename = (f"{prefix}_{int(experiment_angle)}.npy")
+            filename = (f"{prefix}.npy")
 
         filepath = os.path.join(
             self.run_folder,
@@ -219,36 +218,61 @@ class ExperimentRunner:
         self,
         duration=2.0,
     ):      
+        self.recorder.lockin.disable_excitation() 
         measurement_number = 1       
-
-        self.recorder.lockin.disable_excitation()         
          
-        experiment_angle_input = input(
-            "Experimental angle (deg), q = quit: "  
-        )
+        experiment_angle_input = input("Experimental angle (deg), q = quit: ")
 
         if experiment_angle_input.lower() == "q":
             print()
             print("localization quit.")
             return
-        
 
         experiment_angle = float(experiment_angle_input)
+
+    
+        excitation_source_input = input("Excitation source (e = external, l = lock-in amplifier, q = quit): ")
+
+        if excitation_source_input.lower() == "q":
+            print()
+            print("localization quit.")
+            return
+
+        if excitation_source_input.lower() == "e":
+            excitation_source = "EXT"
+        elif excitation_source_input.lower() == "l":
+            excitation_source = "LIA"
+        else:
+            print("Invalid excitation source.")
+            return
+
+    # Distance
+        distance_input = input("Distance (cm), q = quit: ")
+
+        if distance_input.lower() == "q":
+            print()
+            print("localization quit.")
+            return
+
+        try:
+            distance = float(distance_input)
+        except ValueError:
+            print("Invalid distance.")
+            return
 
         input("confirm to execute, press ENTER...")
         print("Recording...")
 
         measurement = self.recorder.record(duration=duration)
 
-        print("Recording finished.")
+        print(f"Recording finished, {(experiment_angle)}° - {(distance)}cm - {(excitation_source)}.")
 
-        print("DEBUG experiment_angle =",experiment_angle)
-            
+        prefix_label = (f"AUE{int(experiment_angle)}_{int(distance)}_{excitation_source}")
         self.save_measurement(
             measurement,
             measurement_number,
             experiment_angle,
-            prefix= "AUE" #Angle Under Estimation //20AUG YZ
+            prefix= prefix_label
         )
 
 def con_AUE( #convert a meansurement file of the angle under estimation to a dictionary variant //20AUG YZ
@@ -291,7 +315,7 @@ def con_AUE( #convert a meansurement file of the angle under estimation to a dic
         (mag_mean_z0 + mag_mean_z1)
     )
 
-# generating
+# generating val_for_loc means value for localizing
     val_for_loc = {
 
         "angle":
@@ -325,7 +349,6 @@ def con_AUE( #convert a meansurement file of the angle under estimation to a dic
     return val_for_loc   
 
 
-
 # estimation of an point's angle //20AUG YZ
 # LDND = Least Difference of Normalized Difference of mean of response of cantilevers //20AUG YZ
 def est_LDND(norm_diff_point_loc, calib_filepath): 
@@ -338,27 +361,28 @@ def est_LDND(norm_diff_point_loc, calib_filepath):
 
     ND_cal = calibration["norm_diff"]
     angles_cal = calibration["angles"]
+    
+    norm_diff_point_loc_val = norm_diff_point_loc["norm_diff"]#source stamp //
+    norm_diff_point_loc_src = norm_diff_point_loc["source_file"]
 
-# read the interested point and convert to magnitude //21AUG YZ
-    if isinstance(norm_diff_point_loc, np.ndarray):
-        z_point = norm_diff_point_loc[0]
+# read the point under estimation and convert to magnitude //21AUG YZ
+    if isinstance(norm_diff_point_loc_val, np.ndarray):
+        z_point = norm_diff_point_loc_val[0]
     else:
-        z_point = norm_diff_point_loc
-
+        z_point = norm_diff_point_loc_val
+    # Magnitude of the point under estimation
     mag_point = abs(z_point)
 
     # Magnitude of 36 calibration points
     mag_cal = np.abs(ND_cal)
 
-# check absolute difference of different between the interested point and calibrations //21AUG YZ
-    magnitude_diff = np.abs(
-        mag_cal - mag_point
-    )
+# check absolute difference of different between the point under estimation and the known calibrations //21AUG YZ
+    magnitude_diff = np.abs( mag_cal - mag_point)
 
 # sort the differences by ascend, keep the 3 smallest, smallest means nearest //21AUG YZ
     nearest_3 = np.argsort(magnitude_diff)[:3]
 
-    AUE_3 = []
+    AUE_3 = [] # most possible estimation result //21AUG YZ
 
     for idx in nearest_3:
         AUE_3.append({
@@ -366,7 +390,8 @@ def est_LDND(norm_diff_point_loc, calib_filepath):
             "angle": angles_cal[idx],
             "calibration_point": ND_cal[idx],
             "magnitude": mag_cal[idx],
-            "magnitude_diff": magnitude_diff[idx]
+            "magnitude_diff": magnitude_diff[idx],
+            "est_source_file": norm_diff_point_loc_src
         })
         print(
             f"Angle: {angles_cal[idx]:+.1f}°, "

@@ -84,9 +84,9 @@ FILTER_ORDER = 4
 HARMONIC = 1
 
 # Frequency sweep parameters of start and stop frequency in Hertz, number of frequency points, sweeping in linear or log, window width of averaging
-F_START = 500
+F_START = 100
 F_STOP = 2000
-POINTS = 2000
+POINTS = 3800
 SWEEP_MODE = "linear"
 AVERAGES = 10
 

@@ -437,15 +437,18 @@ def plot_loc_est(
 
     ND_cal = calibration["norm_diff"]
     angles_cal = calibration["angles"]
+    source_stamp = calibration["source_files"]
     calib_timestamp = calibration ["created"][:19].replace("T"," - ")
 
 
 # read the interested point and convert to magnitude //21AUG YZ
+    norm_diff_point_loc_val = norm_diff_point_loc["norm_diff"]
+    norm_diff_point_loc_src = norm_diff_point_loc["source_file"]
 
-    if isinstance(norm_diff_point_loc, np.ndarray):
-        z_point = norm_diff_point_loc[0]
+    if isinstance(norm_diff_point_loc_val, np.ndarray):
+        z_point = norm_diff_point_loc_val[0]
     else:
-        z_point = norm_diff_point_loc
+        z_point = norm_diff_point_loc_val
 
     x_point = z_point.real
     y_point = z_point.imag
@@ -600,7 +603,7 @@ def plot_loc_est(
     )
 
     ax.set_title(
-        f"EST by LDND of calibration on {calib_timestamp}\n at {timestamp} "
+        f"EST by LDND of CAL on {calib_timestamp}\n at {timestamp} for {norm_diff_point_loc_src}" # calibration time, estimation time, file name underestimation //24AUG YZ
     )
 
     ax.grid(

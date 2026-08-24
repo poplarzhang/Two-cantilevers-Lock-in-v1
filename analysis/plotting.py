@@ -97,55 +97,95 @@ def plot_resonance_fit(
     plt.close( )
     
 
-def plot_amplitude_summary( # amplitude changed from measurements //18AUG YZ
+def plot_amplitude_summary(
     summary,
-    save_path = None # add saving feature //15AUG YZ
+    save_path=None
 ):
-   
-    plt.figure(
-        figsize=(9,5)
+
+    fig, ax1 = plt.subplots(
+        figsize=(9, 5)
     )
 
-    plt.plot(
-        summary["angle"],#["number"], //18AUG YZ
+#demod0 - CL1 - left Y axis
+
+    ax1.plot(
+        summary["angle"],
         summary["r_0"],
         'o-',
-        label="Demod 0"
+        color="#1f77b4",
+        label="Demod 0",
+        linewidth=1,
+        markersize=4
     )
 
-    plt.plot(
-        summary["angle"],#["number"], //18AUG YZ
+    ax1.set_xlabel(
+        "Measurement angle"
+    )
+
+    ax1.set_ylabel(
+        "Demod 0 Amplitude R",
+        color="#1f77b4"
+    )
+
+    ax1.tick_params(
+        axis="y",
+        labelcolor="#1f77b4"
+    )
+
+    ax1.grid()
+
+#demod1 - CL2 - right Y axis
+
+    ax2 = ax1.twinx()
+
+    ax2.plot(
+        summary["angle"],
         summary["r_1"],
         'o-',
-        label="Demod 1"
+        color="#d62728",
+        label="Demod 1",
+        linewidth=1,
+        markersize=4
     )
 
-    plt.xlabel(
-        "Measurement angle"# change number to angel //18AUG YZ
+    ax2.set_ylabel(
+        "Demod 1 Amplitude R",
+        color="#d62728"
     )
 
-    plt.ylabel(
-        "Amplitude R"
+    ax2.tick_params(
+        axis="y",
+        labelcolor="#d62728"
     )
 
-    plt.title(        
-        f"Cantilever amplitude evolution by {summary["created"][-1]}\non {timestamp}" # "Cantilever amplitude evolution" timestamp added //11AUG YZ
-    )
-    plt.grid()
-    plt.legend()
+#title
 
-    if save_path is not None: #save to a given path from external calling for //15AUG YZ
+    ax1.set_title(
+        f'AMP evolution by {summary["created"][-1]}\n'
+        f'on {timestamp}'
+    )
+
+#legends handler
+
+    lines1, labels1 = ax1.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+
+    ax1.legend(
+        lines1 + lines2,
+        labels1 + labels2
+    )
+
+    if save_path is not None:
+
         plt.savefig(
             save_path,
             dpi=300,
             bbox_inches="tight"
-
         )
 
     plt.show()
     plt.close()
-
-
+   
 def plot_phase_summary(
     summary,
     save_path = None # add saving feature //15AUG YZ
@@ -180,7 +220,8 @@ def plot_phase_summary(
     plt.title(
         # "Phase evolution" title changed to "Cantilever phase evolution" //10AUG YZ
         # "Cantilever phase evolution" #10AUG YZ
-        f"Cantilever phase evolution by {summary["created"][-1]}\non {timestamp}" #timestamp added //11AUG YZ        
+        f'Ph. evolution by {summary["created"][-1]}\n'
+        f'on {timestamp}'        
     )
 
     plt.grid()
@@ -195,8 +236,6 @@ def plot_phase_summary(
 
     plt.show()
     plt.close()
-   
-
 
 #### add new plotting of in-phase and quadrature components #### //18AUG YZ
 def plot_xcomp_summary(
@@ -297,7 +336,7 @@ def plot_ycomp_summary(
         summary["angle"],
         summary["y_0"],
         'o-',
-        label="cantilever 1 in-phase"
+        label="cantilever 1 quadrature"
     )
 
     plt.xlabel(
@@ -334,7 +373,7 @@ def plot_ycomp_summary(
 
     plt.plot(
         summary["angle"],
-        summary["x_1"],
+        summary["y_1"],
         'o-',
         label="cantilever 2 quadrature"
     )
@@ -368,10 +407,121 @@ def plot_ycomp_summary(
     plt.show()
     plt.close()
 
+# plot all components combined //24AUG YZ
+def plot_components_summary(
+    summary,
+    save_path=None
+):
 
-# plot the sweep result has been move from main.ipynb to plotting.py //15AUG YZ
+    fig, ax1 = plt.subplots(
+        figsize=(10, 6)
+    )
 
-# plot the sweep result has been move from main.ipynb to plotting.py //15AUG YZ
+    angle = summary["angle"]
+
+# CL1 on the left Y axis
+
+    ax1.plot(
+        angle,
+        summary["x_0"],
+        'o-',
+        color="#1f77b4",
+        label="CL1 in-phase",
+        linewidth=1,
+        markersize=4
+    )
+
+    ax1.plot(
+        angle,
+        summary["y_0"],
+        'o--',
+        color="#1f77b4",
+        label="CL1 quadrature",
+        linewidth=1,
+        markersize=4
+    )
+
+    ax1.set_xlabel(
+        "Measurement angle"
+    )
+
+    ax1.set_ylabel(
+        "CL1 component",
+        color="#1f77b4"
+    )
+
+    ax1.tick_params(
+        axis="y",
+        labelcolor="#1f77b4"
+    )
+
+#CL2 on the right Y axis
+
+    ax2 = ax1.twinx()
+
+    ax2.plot(
+        angle,
+        summary["x_1"],
+        's-',
+        color="#d62728",
+        label="CL2 in-phase",
+        linewidth=1,
+        markersize=4
+    )
+
+    ax2.plot(
+        angle,
+        summary["y_1"],
+        's--',
+        color="#d62728",
+        label="CL2 quadrature",
+        linewidth=1,
+        markersize=4
+    )
+
+    ax2.set_ylabel(
+        "CL2 component",
+        color="#d62728"
+    )
+
+    ax2.tick_params(
+        axis="y",
+        labelcolor="#d62728"
+    )
+
+
+    ax1.set_title(
+        f'Cantilever components evolution by {summary["created"][-1]}\n'
+        f'on {timestamp}'
+    )
+
+    ax1.grid()
+
+# legends handler
+
+    lines1, labels1 = ax1.get_legend_handles_labels()
+    lines2, labels2 = ax2.get_legend_handles_labels()
+
+    ax1.legend(
+        lines1 + lines2,
+        labels1 + labels2
+    )
+
+
+    if save_path is not None:
+
+        plt.savefig(
+            os.path.join(
+                save_path,
+                "CL1_CL2_components_EVL.png"
+            ),
+            dpi=300,
+            bbox_inches="tight"
+        )
+
+    plt.show()
+    plt.close()
+
 def plot_sweep(
     frequency,
     amplitude_0,
