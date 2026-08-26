@@ -18,7 +18,7 @@ def build_calibration_from_csv(experiment_folder):
         names=True
     )
     summary_timestamp = datetime.fromtimestamp(
-        os.path.getctime(filename)
+        os.path.getmtime(filename) #changed from getctime to getmtime
     ).isoformat()
 # read values
 
@@ -82,13 +82,14 @@ def build_calibration_from_csv(experiment_folder):
     }
 
     print()
-    print("Calibration built from CSV")
+    print("Calibration built from CSV", summary_timestamp)
     print(f"Source: {filename}")
     print(f"Number of angles: {len(angles)}")
     print(calibration_from_summary)
     print("71 67 77 89")
     print("=-=-=-=-=-=")
 
+  
     return calibration_from_summary
 
 

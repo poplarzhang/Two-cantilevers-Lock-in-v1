@@ -74,7 +74,7 @@ def plot_calibration(
 
     plt.show()
     plt.close()
-    print("calibration by ratio of mean of responses plotted and saved", timestamp)    
+    print(f"calibration of {calib_timestamp}by ratio of mean of responses plotted and saved", timestamp)    
 
 
 # plot two cantilevers mean values by angle begins //11AUG YZ
