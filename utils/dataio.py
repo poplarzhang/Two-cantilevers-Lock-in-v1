@@ -1,8 +1,14 @@
 import os
+
+import csv
+
 from datetime import datetime
+
 import json
+
 import numpy as np
 
+timestamp = datetime.now().strftime("%y-%m-%d %H-%M")
 
 # ==========================================================
 # Sweep data
@@ -310,30 +316,20 @@ def save_fit(
     folder,
     filename="fit.json"
 ):
-
     """
     Save resonance fit result.
-
     Converts numpy objects into normal Python
     types before writing JSON.
     """
-
-    import json
-    import numpy as np
-    import os
-
-
     os.makedirs(
         folder,
         exist_ok=True
     )
 
-
     filepath = os.path.join(
         folder,
         filename
     )
-
 
     # Convert numpy objects
 
@@ -355,16 +351,12 @@ def save_fit(
         ):
 
             clean_fit[key] = float(value)
-
-
         elif isinstance(
             value,
             np.integer
         ):
 
             clean_fit[key] = int(value)
-
-
         else:
 
             clean_fit[key] = value
@@ -396,19 +388,11 @@ def save_fit(
 
     return filepath
 
-
-
-
 def save_summary(
     summary,
     folder,
     filename="summary.csv"
 ):
-
-    import os
-    import csv
-
-
     filepath = os.path.join(
         folder,
         filename
@@ -427,7 +411,6 @@ def save_summary(
         ]
     )
 
-
     with open(
         filepath,
         "w",
@@ -444,15 +427,8 @@ def save_summary(
             rows
         )
 
-
-    print(
-        "Summary saved:"
-    )
-
-    print(
-        filepath
-    )
-
+    print("Summary saved: ", filepath, " - ", timestamp)
+    print()
 
     return filepath
     

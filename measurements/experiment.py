@@ -284,7 +284,7 @@ def con_AUE( #convert a meansurement file of the angle under estimation to a dic
     ).item()
 # reading
     angle = data["metadata"]["experiment_angle"]
-    AUE_time =data["metadata"]["timestamp"]
+    AUE_time = data["metadata"]["timestamp"]
     x0 = np.mean(data["x_0"])
     y0 = np.mean(data["y_0"])
 
@@ -315,7 +315,7 @@ def con_AUE( #convert a meansurement file of the angle under estimation to a dic
         (mag_mean_z0 + mag_mean_z1)
     )
 
-# generating val_for_loc means value for localizing
+# generating, val_for_loc means value for localizing
     val_for_loc = {
 
         "angle":
@@ -340,6 +340,8 @@ def con_AUE( #convert a meansurement file of the angle under estimation to a dic
             np.array([phase1]),
         "norm_diff":
             np.array([norm_diff]),
+        "power":
+            np.array([mag_mean_z0**2 + mag_mean_z1**2]), # added for using full residual estimation //28AUG YZ
         "source_files":
             [Path(aue_filename).name],
         "created":
@@ -361,9 +363,10 @@ def est_LDND(norm_diff_point_loc, calib_filepath):
 
     ND_cal = calibration["norm_diff"]
     angles_cal = calibration["angles"]
-    
-    norm_diff_point_loc_val = norm_diff_point_loc["norm_diff"]#source stamp //
-    norm_diff_point_loc_src = norm_diff_point_loc["source_file"]
+
+# read the value of point under estimation 
+    norm_diff_point_loc_val = norm_diff_point_loc["norm_diff"]
+    norm_diff_point_loc_src = norm_diff_point_loc["source_file"]#source stamp //
 
 # read the point under estimation and convert to magnitude //21AUG YZ
     if isinstance(norm_diff_point_loc_val, np.ndarray):
@@ -398,4 +401,112 @@ def est_LDND(norm_diff_point_loc, calib_filepath):
             f"MAG: {mag_cal[idx]:.6f} - "
             f"ABS of MAG_DIFF: {abs(magnitude_diff[idx]):.6f} \n"
         )
+    return AUE_3
+
+
+#FRES, estimation by Full RESidual //28AUG YZ
+def est_FRES(comp_point_loc, calib_filepath):
+
+  # read calibration data
+    calibration = np.load(
+        calib_filepath,
+        allow_pickle=True
+    ).item()
+
+    angles_cal = calibration["angles"] 
+    cal_z0 = calibration["Cantilever 1"]
+    cal_z1 = calibration["Cantilever 2"]
+    cal_power =  calibration["power"]   
+  
+    comp_point_loc_z0 = comp_point_loc["z0"] [0]
+    comp_point_loc_z1 = comp_point_loc["z1"] [0]
+    comp_point_loc_vec = np. array( # vector of point's complex to localize
+        [
+            comp_point_loc_z0,
+            comp_point_loc_z1
+        ],
+        dtype=complex
+    )
+    comp_point_loc_power = comp_point_loc["power"][0]
+
+    FRES_result = []
+
+    for z0, z1, power, angles_cal in zip(
+        cal_z0,
+        cal_z1,
+        cal_power,
+        angles_cal
+    ):
+        cal_vec = np.array(
+            [
+            cal_z0,
+            cal_z1
+            ],
+            dtype = complex
+        )
+
+        if (
+            cal_power < 1e-30 # check measured power //30AUG YZ
+            or comp_point_loc_power < 1e-30
+        ):
+            residual = np.inf
+            ccon = 0 + 0j# a Complex CONstant defined by calibration and point under estiamtion //30AUG YZ
+          
+        else:
+            ccon = ( 
+                np.vdot(
+                    cal_vec,
+                    comp_point_loc_vec
+                )
+                /
+                cal_power
+            )
+            residual = np. linalg.norm( comp_point_loc_vec-ccon*cal_vec )
+
+        FRES_result.append(
+            (
+                angles_cal,
+                residual,
+                ccon
+            )
+        )
+
+    FRES_result = np. array( # format and conver result
+            FRES_result,
+            dtype = [
+                ("angle", "f8"),
+                ("residual", "f8")
+                ("ccon", "c16")
+            ]
+        )
+
+    nearest_3 = np.argsort(FRES_result["residual"])[:3]
+
+    AUE_3 = []
+    for idx in nearest_3:
+
+        AUE_3.append({
+
+            "index":idx,
+
+            "angle":FRES_result["angle"][idx],
+
+            "residual":FRES_result["residual"][idx],
+
+            "C":FRES_result["C"][idx],
+
+            "est_source_file":comp_point_loc["source_file"]
+        })
+
+
+        print(
+            f"Angle: "
+            f"{FRES_result['angle'][idx]:+.1f}°, "
+            f"Residual: "
+            f"{FRES_result['residual'][idx]:.6f}, "
+            f"C: "
+            f"{FRES_result['C'][idx]}"
+        )
+        
+        
     return AUE_3

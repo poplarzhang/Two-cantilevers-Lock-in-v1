@@ -28,7 +28,7 @@ OUTPUT_CHANNEL = 0
 OFFSET = 0
 
 # AC excitation amplitude in volts
-AMPLITUDE = 0.005
+AMPLITUDE = 0.05
 
 
 # Signal Inputs in volts

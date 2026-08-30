@@ -23,45 +23,23 @@ def load_measurements(folder):
             filename
         )
 
-
         data = np.load(
             path,
             allow_pickle=True
         ).item()
 
-
         measurements.append(
             data
         )
-
-        # print(
-        #     "Loaded:",
-        #     filename
-        # )
-        # print(measurements[-1]) #print the last added item //18AUG YZ
+    
+        print(filename, " - loaded- ")      
         
     return measurements
 
 
 
 
-def summarize_measurements(measurements):
-
-# returned structure as below
-# summary
-# {
-#     "angle": [0, 10, 20, 30, ...],
-
-#     "x_0": [mean_x0_0, mean_x0_10, mean_x0_20, ...],
-
-#     "y_0": [mean_y0_0, mean_y0_10, mean_y0_20, ...],
-
-#     "x_1": [mean_x1_0, mean_x1_10, mean_x1_20, ...],
-
-#     "y_1": [mean_y1_0, mean_y1_10, mean_y1_20, ...]
-# }
-
-
+def summarize_measurements(measurements): #all values are read and averaged for one angle, no other operation or calculation happens //28AUG YZ
 
     summary = { # the summary has been changed from the sequence of calibration,
     # magnitude of cantilevers, and phase of cantilevers to new components //17AUG
@@ -88,31 +66,30 @@ def summarize_measurements(measurements):
             ["timestamp"][:19].replace("T", " ")
         )
 
+        # the following data is still taking the average from the calibration files, format is changed to: angle, x_0, y_0, x_1, y_1 //17AUG YZ
+        summary["x_0"].append(
+            np.mean(
+                measurement["x_0"]
+            )
+        )
 
-# the following data is still taking the average from the calibration files, format is changed to: angle, x_0, y_0, x_1, y_1 //17AUG YZ
-        summary["x_0"].append(# summary["r_0"].append(
-            np.mean(#     np.mean(
-                 measurement["x_0"]#         measurement["r_0"]
+        summary["y_0"].append(
+            np.mean(
+                measurement["y_0"]
+            )
+        )
+
+        summary["x_1"].append(
+            np.mean(
+                measurement["x_1"]
             )#     )
         )# )
 
-        summary["y_0"].append(# summary["r_1"].append(
-            np.mean(#     np.mean(
-                measurement["y_0"]#         measurement["r_1"]
-            )#     )
-        )# )
-
-        summary["x_1"].append(# summary["phase_0"].append(
-            np.mean(#     np.mean(
-                measurement["x_1"]#         measurement["phase_0"]
-            )#     )
-        )# )
-
-        summary["y_1"].append(# summary["phase_1"].append(
-            np.mean(   #     np.mean(
-                measurement["y_1"]#         measurement["phase_1"]
-            )#     )
-        )# )
+        summary["y_1"].append(
+            np.mean(   
+                measurement["y_1"]
+            )
+        )
 
         summary["r_0"].append(
             np.mean(measurement["r_0"])

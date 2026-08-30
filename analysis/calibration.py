@@ -74,7 +74,8 @@ def build_calibration_from_csv(experiment_folder):
             np.array(phase1),
         "norm_diff":
             np.array(diff_points/(mag_mean_z0+mag_mean_z1)),
-
+        "power":
+            np.array(mag_mean_z0**2+mag_mean_z1**2),
         "source_files":
             [Path(filename).resolve()],
         "created":
