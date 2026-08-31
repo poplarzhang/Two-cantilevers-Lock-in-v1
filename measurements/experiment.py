@@ -386,7 +386,7 @@ def est_LDND(norm_diff_point_loc, calib_filepath):
     nearest_3 = np.argsort(magnitude_diff)[:3]
 
     AUE_3 = [] # most possible estimation result //21AUG YZ
-
+    print()
     for idx in nearest_3:
         AUE_3.append({
             "index": idx,
@@ -399,7 +399,7 @@ def est_LDND(norm_diff_point_loc, calib_filepath):
         print(
             f"Angle: {angles_cal[idx]:+.1f}°, "
             f"MAG: {mag_cal[idx]:.6f} - "
-            f"ABS of MAG_DIFF: {abs(magnitude_diff[idx]):.6f} \n"
+            f"ABS of MAG_DIFF: {abs(magnitude_diff[idx]):.6f}"
         )
     return AUE_3
 
@@ -431,7 +431,7 @@ def est_FRES(comp_point_loc, calib_filepath):
 
     FRES_result = []
 
-    for z0, z1, power, angles_cal in zip(
+    for z0, z1, power, angle in zip(
         cal_z0,
         cal_z1,
         cal_power,
@@ -439,14 +439,14 @@ def est_FRES(comp_point_loc, calib_filepath):
     ):
         cal_vec = np.array(
             [
-            cal_z0,
-            cal_z1
+                z0,
+                z1
             ],
             dtype = complex
         )
 
         if (
-            cal_power < 1e-30 # check measured power //30AUG YZ
+            power < 1e-30 # check measured power //30AUG YZ
             or comp_point_loc_power < 1e-30
         ):
             residual = np.inf
@@ -459,23 +459,25 @@ def est_FRES(comp_point_loc, calib_filepath):
                     comp_point_loc_vec
                 )
                 /
-                cal_power
+                power
             )
             residual = np. linalg.norm( comp_point_loc_vec-ccon*cal_vec )
-
+            
+      
         FRES_result.append(
             (
-                angles_cal,
+                angle,
                 residual,
                 ccon
             )
         )
+  
 
     FRES_result = np. array( # format and conver result
             FRES_result,
             dtype = [
                 ("angle", "f8"),
-                ("residual", "f8")
+                ("residual", "f8"),
                 ("ccon", "c16")
             ]
         )
@@ -493,7 +495,7 @@ def est_FRES(comp_point_loc, calib_filepath):
 
             "residual":FRES_result["residual"][idx],
 
-            "C":FRES_result["C"][idx],
+            "C":FRES_result["ccon"][idx],
 
             "est_source_file":comp_point_loc["source_file"]
         })
@@ -505,7 +507,7 @@ def est_FRES(comp_point_loc, calib_filepath):
             f"Residual: "
             f"{FRES_result['residual'][idx]:.6f}, "
             f"C: "
-            f"{FRES_result['C'][idx]}"
+            f"{FRES_result['ccon'][idx]}"
         )
         
         

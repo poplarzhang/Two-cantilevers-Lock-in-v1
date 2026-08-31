@@ -1588,8 +1588,8 @@ def plot_pwr_est(
         ax.annotate(
             f"{angle:+.0f}°",
             (
-                angle
-                #power
+                angle,
+                power
             ),
             xytext=(4, 4),
             textcoords="offset points",
