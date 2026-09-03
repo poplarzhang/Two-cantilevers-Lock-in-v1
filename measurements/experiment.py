@@ -512,3 +512,131 @@ def est_FRES(comp_point_loc, calib_filepath):
         
         
     return AUE_3
+
+
+def est_DIFF(comp_point_loc, calib_filepath):
+
+    # read calibration data
+    calibration = np.load(
+        calib_filepath,
+        allow_pickle=True
+    ).item()
+
+    angles_cal = calibration["angles"]
+    cal_z0 = calibration["Cantilever 1"]
+    cal_z1 = calibration["Cantilever 2"]
+
+
+  # point under estimation, taking the two cantilever's complex value and convert to a vector //03SEP YZ
+
+    comp_point_loc_z0 = comp_point_loc["z0"][0]
+    comp_point_loc_z1 = comp_point_loc["z1"][0]
+
+    comp_point_loc_vec = np.array(
+        [
+            comp_point_loc_z0,
+            comp_point_loc_z1
+        ],
+        dtype=complex
+    )
+
+
+   # calculate the difference between the vector of point under estimation and the vector of calibration points //03SEP YZ
+
+    DIFF_result = []
+
+    for z0, z1, angle in zip(
+        cal_z0,
+        cal_z1,
+        angles_cal
+    ):
+
+        # Calibration complex vector
+        cal_vec = np.array(
+            [
+                z0,
+                z1
+            ],
+            dtype=complex
+        )
+
+
+        # Difference between unknown and calibration
+        diff_vec = (
+            comp_point_loc_vec
+            -
+            cal_vec
+        )
+
+
+        # Sum of magnitudes of the two differences
+        mag_diff = (
+            abs(diff_vec[0])
+            +
+            abs(diff_vec[1])
+        )
+
+        DIFF_result.append(
+            (
+                angle,
+                mag_diff
+            )
+        )
+
+    # convert the result to a numpy array //03SEP YZ
+
+    DIFF_result = np.array(
+        DIFF_result,
+        dtype=[
+            ("angle", "f8"),
+            ("mag_diff", "f8")
+        ]
+    )
+
+
+   # sort 
+
+    nearest_3 = np.argsort(
+        DIFF_result["mag_diff"]
+    )[:3]
+
+    # take the minium 3 points and return
+    AUE_3 = []
+
+    for idx in nearest_3:
+
+        AUE_3.append({
+
+            "index":
+                idx,
+
+            "angle":
+                DIFF_result["angle"][idx],
+
+            "mag_diff":
+                DIFF_result["mag_diff"][idx],
+
+            "calibration_point":
+                np.array(
+                    [
+                        cal_z0[idx],
+                        cal_z1[idx]
+                    ],
+                    dtype=complex
+                ),
+
+            "est_source_file":
+                comp_point_loc["source_file"]
+        })
+
+
+        print(
+            f"Angle: "
+            f"{DIFF_result['angle'][idx]:+.1f}°, "
+            f"Difference: "
+            f"{DIFF_result['mag_diff'][idx]:.6f}"
+        )
+
+
+    return AUE_3
+ 
