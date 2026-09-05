@@ -3,6 +3,8 @@ import numpy as np
 from pathlib import Path
 from datetime import datetime
 
+from zhinst.toolkit import Session
+
 from measurements.recorder import HF2LIRecorder
 
 from instrument.hf2li import HF2LI
@@ -367,26 +369,20 @@ def arb_run(
 
     # source, mark only
 
-    excitation_source_input = input(
-        "Excitation source "
-        "(e = external, l = lock-in amplifier, q = quit): "
+    excitation_source_input = input("Excitation source,(e = external, l = lock-in amplifier, q = quit): "
     ).strip().lower()
 
     if excitation_source_input == "q":
-        print()
         print("ARB quit.")
         return
 
     if excitation_source_input == "e":
-
         excitation_source = "EXT"
 
     elif excitation_source_input == "l":
-
         excitation_source = "LIA"
 
     else:
-
         print("Invalid excitation source.")
         return
 
@@ -397,7 +393,6 @@ def arb_run(
     ).strip()
 
     if distance_input.lower() == "q":
-        print()
         print("ARB quit.")
         return
 
@@ -420,8 +415,6 @@ def arb_run(
     ).strip()
 
     if confirmation.lower() == "q":
-
-        print()
         print("ARB quit.")
 
         return
@@ -439,25 +432,21 @@ def arb_run(
 
     lockin.connect()
 
-    try:  
-      
+    try:        
         lockin.initialize()      
-
 
         lockin.set_frequency(
             frequency=frequency,
             oscillator=OSCILLATOR_1,
             verbose=True
         )
-
       
         lockin.configure_demod(
             demod=DEMOD_1,
             adc=ADC_1,
             oscillator=OSCILLATOR_1,
             rate=DEMOD_RATE_1
-        )
-       
+        )       
 
         lockin.configure_demod(
             demod=DEMOD_2,
@@ -465,7 +454,6 @@ def arb_run(
             oscillator=OSCILLATOR_2,
             rate=DEMOD_RATE_2
         )
-
         
         output = lockin.device.sigouts[
             OUTPUT_CHANNEL
@@ -476,15 +464,12 @@ def arb_run(
         output.amplitudes[0](
             amplitude
         )
-
         output.enables[0](True)
 
         # Keep physical output OFF
         output.on(False)
 
-        print(
-            "Amplitude configured."
-        )
+        print("Amplitude configured.")
 
     # recorder
 
@@ -496,8 +481,6 @@ def arb_run(
             )
         )
 
-    
-       # recording
 
         try:
 
@@ -557,10 +540,11 @@ def arb_run(
 
         print(filepath)
         print("ARB done and saved")
-    
+
+ # turn off excitation and exit
+
     finally:
 
-        # turn off excitation and exit
         try:
 
             lockin.disable_excitation()
@@ -939,4 +923,94 @@ def est_DIFF(comp_point_loc, calib_filepath):
 
 
     return AUE_3
- 
+
+
+
+ # fixed OSC output for evaluation //05SEP YZ
+def fixed_OSC_run():
+    
+    DEVICE_ID = "dev376"
+    SERVER_HOST = "localhost"
+
+    OUTPUT_CHANNEL = 0       # Signal Out 1
+
+    frequency_input = input(
+        "Frequency (Hz), q = quit: "
+    ).strip()
+
+    if frequency_input.lower() == "q":
+        print("Quit.")
+    else:
+
+        amplitude_input = input(
+            "Amplitude (V), q = quit: "
+        ).strip()
+
+        if amplitude_input.lower() == "q":
+            print("Quit.")
+
+        else:
+
+            try:
+                frequency = float(frequency_input)
+                amplitude = float(amplitude_input)
+
+            except ValueError:
+                print("Invalid frequency or amplitude.")
+
+            else:
+
+                # show configuration
+                print(frequency, " - Hz  ", amplitude*1000, " - mV")
+                print()
+            
+
+                confirmation = input(
+                    "Press ENTER to start output, q = quit: "
+                ).strip()
+
+                if confirmation.lower() == "q":
+
+                    print("Quit.")
+
+                else:
+
+                    session = Session(
+                        SERVER_HOST,
+                        hf2=True
+                    )
+
+                    device = session.connect_device(
+                        DEVICE_ID
+                    )                    
+
+                    device.oscs[0].freq(
+                        frequency
+                    )
+
+                    output = device.sigouts[
+                        OUTPUT_CHANNEL
+                    ]
+
+                    # DC offset
+                    output.offset(0.0)
+
+                    # AC amplitude
+                    output.amplitudes[0](
+                        amplitude
+                    )
+
+                    # Enable mixer path
+                    output.enables[0](True)
+
+                    output.on(True)
+
+                    # enter to stop
+                    input()
+                    output.on(False)
+
+                    print()
+                    print("Signal Output 1 disabled.")
+
+
+    return

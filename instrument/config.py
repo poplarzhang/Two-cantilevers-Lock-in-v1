@@ -8,11 +8,9 @@ SERVER_HOST = "localhost"
 # HF2LI communication mode.
 HF2 = True
 
-
 # General experiment information
 # Optional name of the experiment.
 EXPERIMENT_NAME = "test_measurement"
-
 
 # Signal Output (excitation)
 # used to configure Physical output channel.
@@ -20,9 +18,7 @@ EXPERIMENT_NAME = "test_measurement"
 # HF2LI:
 #   0 = Signal Output 1
 #   1 = Signal Output 2
-
 OUTPUT_CHANNEL = 0
-
 
 # DC offset applied to the output in volts
 OFFSET = 0
@@ -30,12 +26,10 @@ OFFSET = 0
 # AC excitation amplitude in volts
 AMPLITUDE = 0.005
 
-
 # Signal Inputs in volts
 # Increase range if the input signal saturates.
 INPUT_RANGE_1 = 1.0
 INPUT_RANGE_2 = 1.0
-
 
 # Input coupling#
 # False = DC coupling
@@ -43,14 +37,12 @@ INPUT_RANGE_2 = 1.0
 INPUT_AC_1 = False
 INPUT_AC_2 = False
 
-
 # Demodulators
 # Demodulator numbers used in the experiment.
 # HF2LI has six demodulators:
 # 0 ... 5
 DEMOD_1 = 0
 DEMOD_2 = 1
-
 
 # Demodulator sample rates in samples/second
 DEMOD_RATE_1 = 1000
@@ -65,7 +57,6 @@ DEMOD_RATE_2 = 1000
 ADC_1 = 0
 ADC_2 = 1
 
-
 # Oscillator assignment.
 # For your resonance measurements both channels
 # currently use oscillator 0.
@@ -75,10 +66,8 @@ OSCILLATOR_2 = 0
 # Lock-in filtering's time constant in seconds
 TIME_CONSTANT = 0.05
 
-
 # Low-pass filter order.
 FILTER_ORDER = 4
-
 
 # Detection harmonic.
 HARMONIC = 1
@@ -108,7 +97,6 @@ settings = {
     # Demodulators
     "DEMOD_RATE_1": DEMOD_RATE_1,
     "DEMOD_RATE_2": DEMOD_RATE_2,
-
 
     # Sweep
     "F_START": F_START,
