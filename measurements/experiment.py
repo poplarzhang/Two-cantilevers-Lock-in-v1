@@ -3,6 +3,31 @@ import numpy as np
 from pathlib import Path
 from datetime import datetime
 
+from measurements.recorder import HF2LIRecorder
+
+from instrument.hf2li import HF2LI
+
+from instrument.config import (
+     DEVICE_ID,
+    SERVER_HOST,
+    HF2,
+
+    OUTPUT_CHANNEL,
+
+    ADC_1,
+    ADC_2,
+
+    DEMOD_1,
+    DEMOD_2,
+
+    DEMOD_RATE_1,
+    DEMOD_RATE_2,
+
+    OSCILLATOR_1,
+    OSCILLATOR_2,
+)
+
+
 class ExperimentRunner:
     """
     Interactive experiment controller.
@@ -229,7 +254,6 @@ class ExperimentRunner:
             return
 
         experiment_angle = float(experiment_angle_input)
-
     
         excitation_source_input = input("Excitation source (e = external, l = lock-in amplifier, q = quit): ")
 
@@ -274,6 +298,282 @@ class ExperimentRunner:
             experiment_angle,
             prefix= prefix_label
         )
+
+
+# arbitrary experiment to estimate an unknow angle //04SEP YZ
+def arb_run(
+    dest_folder,
+    duration=2.0,
+):
+  # check the given path
+    os.makedirs(
+        dest_folder,
+        exist_ok=True
+    )
+
+   # define the parameters of the experiment, user input required //04SEP YZ
+    # frequency
+    frequency_input = input(
+        "Drive frequency (Hz), q = quit: "
+    ).strip()
+
+    if frequency_input.lower() == "q":
+        print()
+        print("ARB quit.")
+        return
+
+    try:
+        frequency = float(frequency_input)
+
+    except ValueError:
+        print("Invalid frequency.")
+        return
+
+   # angle
+
+    angle_input = input(
+        "Experimental angle (deg), q = quit: "
+    ).strip()
+
+    if angle_input.lower() == "q":
+        print()
+        print("ARB quit.")
+        return
+
+    try:
+        experiment_angle = float(angle_input)
+
+    except ValueError:
+        print("Invalid angle.")
+        return
+
+    # amplitude
+
+    amplitude_input = input(
+        "Drive amplitude (V), q = quit: "
+    ).strip()
+
+    if amplitude_input.lower() == "q":
+        print()
+        print("ARB quit.")
+        return
+
+    try:
+        amplitude = float(amplitude_input)
+
+    except ValueError:
+        print("Invalid amplitude.")
+        return
+
+    # source, mark only
+
+    excitation_source_input = input(
+        "Excitation source "
+        "(e = external, l = lock-in amplifier, q = quit): "
+    ).strip().lower()
+
+    if excitation_source_input == "q":
+        print()
+        print("ARB quit.")
+        return
+
+    if excitation_source_input == "e":
+
+        excitation_source = "EXT"
+
+    elif excitation_source_input == "l":
+
+        excitation_source = "LIA"
+
+    else:
+
+        print("Invalid excitation source.")
+        return
+
+    # distance
+
+    distance_input = input(
+        "Distance (cm), q = quit: "
+    ).strip()
+
+    if distance_input.lower() == "q":
+        print()
+        print("ARB quit.")
+        return
+
+    try:
+        distance = float(distance_input)
+
+    except ValueError:
+        print("Invalid distance.")
+        return
+
+    # print paramters for hint and confirmation
+
+    print(f"ARB - {frequency} Hz - {experiment_angle}° - {amplitude*1000} mV - {excitation_source} - {distance} cm")
+    
+
+   # confirm to execute
+
+    confirmation = input(
+        "ENTER to execute. q = quit: "
+    ).strip()
+
+    if confirmation.lower() == "q":
+
+        print()
+        print("ARB quit.")
+
+        return
+
+   # connect, initialize, configure, record, save
+
+    print()
+    print("start")
+
+    lockin = HF2LI(
+        device_id=DEVICE_ID,
+        host=SERVER_HOST,
+        hf2=HF2,
+    )
+
+    lockin.connect()
+
+    try:  
+      
+        lockin.initialize()      
+
+
+        lockin.set_frequency(
+            frequency=frequency,
+            oscillator=OSCILLATOR_1,
+            verbose=True
+        )
+
+      
+        lockin.configure_demod(
+            demod=DEMOD_1,
+            adc=ADC_1,
+            oscillator=OSCILLATOR_1,
+            rate=DEMOD_RATE_1
+        )
+       
+
+        lockin.configure_demod(
+            demod=DEMOD_2,
+            adc=ADC_2,
+            oscillator=OSCILLATOR_2,
+            rate=DEMOD_RATE_2
+        )
+
+        
+        output = lockin.device.sigouts[
+            OUTPUT_CHANNEL
+        ]
+
+        output.offset(0.0)
+
+        output.amplitudes[0](
+            amplitude
+        )
+
+        output.enables[0](True)
+
+        # Keep physical output OFF
+        output.on(False)
+
+        print(
+            "Amplitude configured."
+        )
+
+    # recorder
+
+        recorder = HF2LIRecorder(
+            lockin,
+            demods=(
+                DEMOD_1,
+                DEMOD_2
+            )
+        )
+
+    
+       # recording
+
+        try:
+
+            measurement = recorder.record(
+                duration=duration
+            )
+
+        finally:
+
+            # Safety: always turn excitation OFF
+            lockin.disable_excitation()
+
+        print()
+        print("Recording finished.")
+
+       # meatadata
+
+        measurement["metadata"] = {
+
+            "frequency": frequency,
+            "amplitude": amplitude,
+            "experiment_angle": experiment_angle,
+            "distance": distance,
+            "excitation_source": excitation_source,
+            "duration": duration,
+            "oscillator": OSCILLATOR_1,
+            "output_channel": OUTPUT_CHANNEL,
+            "demodulators": (
+                DEMOD_1,
+                DEMOD_2
+            ),
+
+            "timestamp": datetime.now().isoformat(),
+        }
+
+# save the measurement with a filename including parameters
+
+        filename = (
+            f"AUE"
+            f"{int(frequency)}_"
+            f"{int(experiment_angle)}_"
+            f"{amplitude*1000:g}_"
+            f"{int(distance)}_"
+            f"{excitation_source}.npy"
+        ) # format = frequency_angle_amplitude_distance_source
+
+        filepath = os.path.join(
+            dest_folder,
+            filename
+        )
+  
+        np.save(
+            filepath,
+            measurement,
+            allow_pickle=True
+        )
+
+        print(filepath)
+        print("ARB done and saved")
+    
+    finally:
+
+        # turn off excitation and exit
+        try:
+
+            lockin.disable_excitation()
+
+        except Exception:
+            pass
+
+        lockin.disconnect()
+
+        print()
+        print("ARB experiment finished.")
+
+
 
 def con_AUE( #convert a meansurement file of the angle under estimation to a dictionary variant //20AUG YZ
     aue_filename
