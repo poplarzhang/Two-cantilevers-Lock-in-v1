@@ -769,6 +769,8 @@ def est_FRES(comp_point_loc, calib_filepath):
     nearest_3 = np.argsort(FRES_result["residual"])[:3]
 
     AUE_3 = []
+    print()
+    print("Full residual estimation results list")
     for idx in nearest_3:
 
         AUE_3.append({
@@ -784,7 +786,7 @@ def est_FRES(comp_point_loc, calib_filepath):
             "est_source_file":comp_point_loc["source_file"]
         })
 
-
+        
         print(
             f"Angle: "
             f"{FRES_result['angle'][idx]:+.1f}°, "
@@ -796,7 +798,86 @@ def est_FRES(comp_point_loc, calib_filepath):
         
         
     return AUE_3
+def est_AD_RMMAG(rmmag_point_loc, calib_filepath): # absolute difference of ratio of mean magnitude 
 
+    # read calibration data
+    calibration = np.load(
+        calib_filepath,
+        allow_pickle=True
+    ).item()
+
+    angles_cal = calibration["angles"]
+    ratio_cal = calibration["ratio_mean_mag"]
+
+    # measured point to be localized
+    rmmag = rmmag_point_loc["rmmag"][0]
+
+    AUE_result = []
+
+    for ratio, angle in zip(
+        ratio_cal,
+        angles_cal
+    ):
+
+        AD_RMMAG = abs( # absolute difference of ratio of mean magnitude between calibration and measured point
+            ratio - rmmag
+        )
+
+        AUE_result.append(
+            (
+                angle,
+                AD_RMMAG,
+                ratio
+            )
+        )
+
+    AUE_result = np.array(
+        AUE_result,
+        dtype=[
+            ("angle", "f8"),
+            ("AD_RMMAG", "f8"),
+            ("ratio", "f8")
+        ]
+    )
+
+    # find three smallest residuals
+    nearest_3 = np.argsort(
+        AUE_result["AD_RMMAG"]
+    )[:3]
+
+    AUE_3 = []
+    
+    print()
+    print("Absolute difference of RMMAG estimation results list")
+
+    for idx in nearest_3:
+
+        AUE_3.append({
+
+            "index":
+                idx,
+            "angle":
+                AUE_result["angle"][idx],
+            "AD_RMMAG":
+                AUE_result["AD_RMMAG"][idx],
+            "rmmag":
+                rmmag,
+            "est_source_file":
+                rmmag_point_loc["source_file"]
+        })
+        
+        print(
+            f"Angle: "
+            f"{AUE_result['angle'][idx]:+.1f}°, "
+            f"AD_RMMAG: "
+            f"{AUE_result['AD_RMMAG'][idx]:.6f}, "
+            # f"Calibration ratio: "
+            # f"{AUE_result['ratio'][idx]:.6f}, "
+            # f"Measured rmmag: "
+            # f"{rmmag:.6f}"
+        )
+
+    return AUE_3
 
 def est_DIFF(comp_point_loc, calib_filepath):
 

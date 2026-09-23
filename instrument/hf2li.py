@@ -944,23 +944,13 @@ class HF2LI:
             100,
             True
         )
-        # debug //04SEP YZ
-        print("raw type:", type(raw))
-        print("raw keys:", list(raw.keys()))
-
-        for key in raw.keys():
-            print("raw key:", repr(key))
-
-        # debug //04SEP YZ
-        
+            
         # unsubscribe
-
         for path in paths:
 
             self.session.daq_server.unsubscribe(
                 path
             )
-
 
         result = {}
 

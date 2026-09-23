@@ -1604,7 +1604,6 @@ def plot_pwr_est(
 
 
    # mark the nearest 3
-
     markers = [
         "o",
         "s",
@@ -1641,29 +1640,22 @@ def plot_pwr_est(
 
 
     # axes
-
     ax.set_xlabel(
         "Angle (deg)"
     )
-
     ax.set_ylabel(
         "Power (|z0|² + |z1|²)"
     )
 
 
     # title
-
     ax.set_title(
         f"EST by FRES of CAL on {calib_timestamp}\n"
         f"at {timestamp} for {pwr_point_loc_src}"
     )
-
-
     ax.grid(alpha=0.3)
 
-
-    # legen
-
+    # legend
     legend_handles = [
 
         Line2D(
@@ -1686,7 +1678,8 @@ def plot_pwr_est(
             markeredgewidth=1.8,
             label=(
                 f"{FRES_3[0]['angle']:+.0f}° "
-                f"- 1st closest"
+                f"- 1st "
+                f"- R={FRES_3[0]['residual']:.6f}"
             )
         ),
 
@@ -1700,7 +1693,8 @@ def plot_pwr_est(
             markeredgewidth=1.8,
             label=(
                 f"{FRES_3[1]['angle']:+.0f}° "
-                f"- 2nd closest"
+                f"- 2nd "
+                f"- R={FRES_3[1]['residual']:.6f}"
             )
         ),
 
@@ -1714,7 +1708,8 @@ def plot_pwr_est(
             markeredgewidth=1.8,
             label=(
                 f"{FRES_3[2]['angle']:+.0f}° "
-                f"- 3rd closest"
+                f"- 3rd "
+                f"- R={FRES_3[2]['residual']:.6f}"
             )
         )
     ]
@@ -1744,3 +1739,250 @@ def plot_pwr_est(
     plt.show()
     plt.close()
     print("FRES estimation plotted and saved",timestamp)
+
+
+def plot_AD_RMMAG_est(
+        rmmag_point_loc,
+        AD_RMMAG_3,
+        calib_filepath,
+        save_path
+):
+
+    # load calibration
+    calibration = np.load(
+        calib_filepath,
+        allow_pickle=True
+    ).item()
+
+    ratio_cal = np.asarray(
+        calibration["ratio_mean_mag"]
+    )
+
+    angles_cal = np.asarray(
+        calibration["angles"]
+    )
+
+    calib_timestamp = (
+        calibration["created"][:19]
+        .replace("T", " - ")
+    )
+
+    # load interested point
+    rmmag = rmmag_point_loc["rmmag"][0]
+
+    rmmag_point_loc_src = (
+        rmmag_point_loc["source_file"][0]
+    )
+
+
+    # initial plot
+    fig, ax = plt.subplots(
+        figsize=(11, 7)
+    )
+
+
+    # plot calibration
+    ax.scatter(
+        angles_cal,
+        ratio_cal,
+        marker="x",
+        color="gray",
+        s=35,
+        linewidths=1.2,
+        alpha=0.55,
+        zorder=3
+    )
+
+
+    # annotate calibration points
+    for ratio, angle in zip(
+        ratio_cal,
+        angles_cal
+    ):
+
+        ax.annotate(
+            f"{angle:+.0f}°",
+            (
+                angle,
+                ratio
+            ),
+            xytext=(4, 4),
+            textcoords="offset points",
+            fontsize=6,
+            bbox=dict(
+                boxstyle="round,pad=0.15",
+                fc="white",
+                ec="none",
+                alpha=0.65
+            )
+        )
+
+
+    # mark the nearest 3
+    markers = [
+        "o",
+        "s",
+        "^"
+    ]
+
+    markers_color = [
+        "green",
+        "orange",
+        "red"
+    ]
+
+
+    for result, marker, color in zip(
+        AD_RMMAG_3,
+        markers,
+        markers_color
+    ):
+
+        idx = result["index"]
+        angle = result["angle"]
+
+        ratio = ratio_cal[idx]
+
+        ax.scatter(
+            angle,
+            ratio,
+            marker=marker,
+            facecolors="none",
+            edgecolors=color,
+            s=70,
+            linewidths=1.8,
+            zorder=7
+        )
+
+
+    # measured RMMAG
+    ax.axhline(
+        y=rmmag,
+        color="black",
+        linestyle="--",
+        linewidth=1.2,
+        alpha=0.7
+    )
+
+
+    # axes
+    ax.set_xlabel(
+        "Angle (deg)"
+    )
+
+    ax.set_ylabel(
+        "Ratio of mean magnitude (r₀ / r₁)"
+    )
+
+
+    # title
+    ax.set_title(
+        f"EST by AD_RMMAG of CAL on "
+        f"{calib_timestamp}\n"
+        f"for {rmmag_point_loc_src}"
+    )
+
+    ax.grid(
+        alpha=0.3
+    )
+
+
+    # legend
+    legend_handles = [
+
+        Line2D(
+            [0], [0],
+            marker="x",
+            color="gray",
+            linestyle="None",
+            markersize=7,
+            markeredgewidth=1.5,
+            label="Calibration"
+        ),
+
+        Line2D(
+            [0], [0],
+            color="black",
+            linestyle="--",
+            linewidth=1.2,
+            label=(
+                f"Measured RMMAG = "
+                f"{rmmag:.6f}"
+            )
+        ),
+
+        Line2D(
+            [0], [0],
+            marker="o",
+            color="green",
+            markerfacecolor="none",
+            linestyle="None",
+            markersize=8,
+            markeredgewidth=1.8,
+            label=(
+                f"{AD_RMMAG_3[0]['angle']:+.0f}° "
+                f"- 1st "
+                f"- AD={AD_RMMAG_3[0]['AD_RMMAG']:.6f}"
+            )
+        ),
+
+        Line2D(
+            [0], [0],
+            marker="s",
+            color="orange",
+            markerfacecolor="none",
+            linestyle="None",
+            markersize=8,
+            markeredgewidth=1.8,
+            label=(
+                f"{AD_RMMAG_3[1]['angle']:+.0f}° "
+                f"- 2nd "
+                f"- AD={AD_RMMAG_3[1]['AD_RMMAG']:.6f}"
+            )
+        ),
+
+        Line2D(
+            [0], [0],
+            marker="^",
+            color="red",
+            markerfacecolor="none",
+            linestyle="None",
+            markersize=8,
+            markeredgewidth=1.8,
+            label=(
+                f"{AD_RMMAG_3[2]['angle']:+.0f}° "
+                f"- 3rd "
+                f"- AD={AD_RMMAG_3[2]['AD_RMMAG']:.6f}"
+            )
+        )
+    ]
+
+
+    fig.subplots_adjust(
+        right=0.72
+    )
+
+    fig.legend(
+        handles=legend_handles,
+        loc="upper left",
+        bbox_to_anchor=(0.75, 0.9),
+        fontsize=7,
+        frameon=True
+    )
+
+
+    plt.tight_layout()
+
+    plt.savefig(
+        save_path,
+        dpi=300,
+        bbox_inches="tight"
+    )
+
+    plt.show()
+    plt.close()
+
+    print(
+        "AD_RMMAG estimation plotted and saved:",
+        save_path
+    )
