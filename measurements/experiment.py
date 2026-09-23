@@ -796,8 +796,10 @@ def est_FRES(comp_point_loc, calib_filepath):
             f"{FRES_result['ccon'][idx]}"
         )
         
-        
     return AUE_3
+
+
+
 def est_AD_RMMAG(rmmag_point_loc, calib_filepath): # absolute difference of ratio of mean magnitude 
 
     # read calibration data
@@ -846,7 +848,7 @@ def est_AD_RMMAG(rmmag_point_loc, calib_filepath): # absolute difference of rati
     )[:3]
 
     AUE_3 = []
-    
+
     print()
     print("Absolute difference of RMMAG estimation results list")
 
