@@ -47,8 +47,8 @@ def build_calibration_from_csv(experiment_folder):
 
     ratio_mean_mag = r0 / r1 # r0 and r1 are mean of magnitudes at one angle, mean(abs(cantilever output))
     
-    mag_mean_z0 = abs(z0)
-    mag_mean_z1 = abs(z1)
+    mag_mean_z0 = abs(z0) # magnitude of mean of complex response at one angel, cantilever 1
+    mag_mean_z1 = abs(z1) # magnitude of mean of complex response at one angel, cantilever 2
 
     calibration_from_summary= {
 

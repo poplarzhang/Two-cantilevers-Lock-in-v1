@@ -1095,7 +1095,7 @@ def plot_calibration_rmmag(
 
     plt.show()
     plt.close()
-    print("calibration by ration of mean magnitude plotted and saved", timestamp)
+    print("calibration by ratio of mean magnitude plotted and saved", timestamp)
 # plot ratio of two cantilevers mean magnitude by angle ends //14AUG YZ
 
 def plot_calibration_power(# plot power of calibration //30AUG YZ
@@ -1157,7 +1157,7 @@ def plot_calibration_power(# plot power of calibration //30AUG YZ
     plt.close()
 
     print(
-        "Calibration power plotted and saved", timestamp)
+        "Calibration by power plotted and saved", timestamp)
 
 
 # plot normalized difference (mean(z0)-mean(z1))/(abs(mean(z0))+abs(mean(z1)))
@@ -1540,7 +1540,7 @@ def plot_loc_est(
     print("71 67 77 89")
     print("=-=-=-=-=-=")
 
-def plot_pwr_est(
+def plot_pwr_est( # used for the plooting of full residual estimation 
         comp_point_loc,
         FRES_3,
         calib_filepath,
@@ -1740,6 +1740,201 @@ def plot_pwr_est(
     plt.close()
     print("FRES estimation plotted and saved",timestamp)
 
+
+def plot_fres_est(
+        comp_point_loc,
+        FRES_3,
+        FRES_result,
+        calib_filepath,
+        save_path
+):
+    # load calibration
+    calibration = np.load(
+        calib_filepath,
+        allow_pickle=True
+    ).item()
+
+    angles_cal = np.asarray(calibration["angles"])
+
+    calib_timestamp = (
+        calibration["created"][:19].replace("T", " - ")
+    )
+
+    # load interested point
+    pwr_point_loc_src = comp_point_loc["source_file"]
+
+   # initialization
+    fig, ax = plt.subplots(
+        figsize=(11, 7)
+    )
+
+    
+    ax.plot(
+        FRES_result["angle"],
+        FRES_result["residual"],
+        linestyle="-",
+        marker=".",
+        markersize=4,
+        linewidth=1.0,
+        color="gray",
+        alpha=0.7,
+        label="FRES residual"
+    )
+
+    # nearest 3
+    markers = [
+        "o",
+        "s",
+        "^"
+    ]
+
+    markers_color = [
+        "green",
+        "orange",
+        "red"
+    ]
+
+    rank_names = [
+        "1st",
+        "2nd",
+        "3rd"
+    ]
+
+    for result, marker, color, rank in zip(
+        FRES_3,
+        markers,
+        markers_color,
+        rank_names
+    ):
+
+        angle = result["angle"]
+        residual = result["residual"]
+
+        ax.scatter(
+            angle,
+            residual,
+            marker=marker,
+            facecolors="none",
+            edgecolors=color,
+            s=90,
+            linewidths=2.0,
+            zorder=7
+        )
+
+        # Optional annotation
+        ax.annotate(
+            f"{angle:+.0f}°",
+            (
+                angle,
+                residual
+            ),
+            xytext=(5, 5),
+            textcoords="offset points",
+            fontsize=8
+        )
+
+    # --------------------------------------------------
+    # Axes
+    # --------------------------------------------------
+    ax.set_xlabel(
+        "Angle (deg)"
+    )
+
+    ax.set_ylabel(
+        "Residuals"
+    )
+
+   # title
+    ax.set_title(
+        f"FRES Residual Estimation of CAL on {calib_timestamp}\n"
+        f"at {timestamp} for {pwr_point_loc_src}"
+    )
+
+    ax.grid(
+        alpha=0.3
+    )
+
+   # legend
+    legend_handles = [
+
+        Line2D(
+            [0], [0],
+            color="gray",
+            linestyle="-",
+            marker=".",
+            markersize=6,
+            linewidth=1.0,
+            label="FRES residual"
+        ),
+
+        Line2D(
+            [0], [0],
+            marker="o",
+            color="green",
+            markerfacecolor="none",
+            linestyle="None",
+            markersize=8,
+            markeredgewidth=1.8,
+            label=(
+                f"{FRES_3[0]['angle']:+.0f}° - 1st "
+                f"- R={FRES_3[0]['residual']:.6f}"
+            )
+        ),
+
+        Line2D(
+            [0], [0],
+            marker="s",
+            color="orange",
+            markerfacecolor="none",
+            linestyle="None",
+            markersize=8,
+            markeredgewidth=1.8,
+            label=(
+                f"{FRES_3[1]['angle']:+.0f}° - 2nd "
+                f"- R={FRES_3[1]['residual']:.6f}"
+            )
+        ),
+
+        Line2D(
+            [0], [0],
+            marker="^",
+            color="red",
+            markerfacecolor="none",
+            linestyle="None",
+            markersize=8,
+            markeredgewidth=1.8,
+            label=(
+                f"{FRES_3[2]['angle']:+.0f}° - 3rd "
+                f"- R={FRES_3[2]['residual']:.6f}"
+            )
+        )
+    ]
+
+    fig.subplots_adjust(
+        right=0.72
+    )
+
+    fig.legend(
+        handles=legend_handles,
+        loc="upper left",
+        bbox_to_anchor=(0.75, 0.9),
+        fontsize=7,
+        frameon=True
+    )
+
+    plt.tight_layout()
+
+    plt.savefig(
+        save_path,
+        dpi=300,
+        bbox_inches="tight"
+    )
+
+    plt.show()
+    plt.close()
+
+    print(
+        "FRES residual estimation plotted and saved",timestamp)
 
 def plot_AD_RMMAG_est(
         rmmag_point_loc,

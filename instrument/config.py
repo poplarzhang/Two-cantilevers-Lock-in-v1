@@ -24,7 +24,7 @@ OUTPUT_CHANNEL = 0
 OFFSET = 0
 
 # AC excitation amplitude in volts
-AMPLITUDE = 0.02
+AMPLITUDE = 0.01
 
 # Signal Inputs in volts
 # Increase range if the input signal saturates.

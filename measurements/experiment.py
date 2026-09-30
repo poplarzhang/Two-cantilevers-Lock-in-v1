@@ -765,6 +765,8 @@ def est_FRES(comp_point_loc, calib_filepath):
                 ("ccon", "c16")
             ]
         )
+    
+    #print("FRES results list\n",FRES_result) # all FRES results are printed 30SEP YZ
 
     nearest_3 = np.argsort(FRES_result["residual"])[:3]
 
@@ -796,7 +798,7 @@ def est_FRES(comp_point_loc, calib_filepath):
             f"{FRES_result['ccon'][idx]}"
         )
         
-    return AUE_3
+    return AUE_3, FRES_result
 
 
 

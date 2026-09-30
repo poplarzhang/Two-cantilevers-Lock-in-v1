@@ -49,10 +49,10 @@ def summarize_measurements(measurements): #all values are read and averaged for 
         "y_0": [],#"r_1": [], CH2 magnitude to CH1 quadrature component
         "x_1": [],#"phase_0": [], CH1 phase to CH2 in-phase component
         "y_1": [],# "phase_1": [], CH2 phase to CH2 quadrature component
-        "r_0": [],
-        "r_1": [],
+        "r_0": [],# CH1 raw magnitude, cantilever 1
+        "r_1": [],# CH2 raw magnitude, cantilever 2
         "phase_0": [],
-        "phase_1":[]
+        "phase_1": []
 
     }
 

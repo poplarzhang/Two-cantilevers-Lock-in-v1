@@ -5,12 +5,7 @@ After a resonance frequency is found,
 the lock-in stays at this frequency and
 records measurements on demand.
 """
-
-
 import time
-
-
-
 class InteractiveMeasurement:
 
 
@@ -21,12 +16,9 @@ class InteractiveMeasurement:
 
         self.lockin = lockin
 
-
-
     # =====================================================
     # Set measurement frequency
     # =====================================================
-
     def set_frequency(
         self,
         frequency
@@ -48,8 +40,6 @@ class InteractiveMeasurement:
             0.2
         )
 
-
-
     # =====================================================
     # Single measurement
     # =====================================================
@@ -59,14 +49,11 @@ class InteractiveMeasurement:
         demod=0
     ):
 
-
         x, y, r, phase = self.lockin.read_xy(
             demod
         )
 
-
         result = {
-
 
             "time": time.time(),
 
@@ -100,22 +87,15 @@ class InteractiveMeasurement:
         self.set_frequency(
             frequency
         )
-
-
         data = []
-
-
 
         print()
         print(
             "Interactive measurement started"
         )
-
         print(
             "Press ENTER for next point"
         )
-
-
 
         for i in range(points):
 
