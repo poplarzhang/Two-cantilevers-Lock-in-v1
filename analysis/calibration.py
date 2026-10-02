@@ -17,6 +17,7 @@ def build_calibration_from_csv(experiment_folder):
         delimiter=",",
         names=True
     )
+    data = np.atleast_1d(data) # add to correctly handle the case of a single calibration point 02OCT YZ
     summary_timestamp = datetime.fromtimestamp(
         os.path.getmtime(filename) #changed from getctime to getmtime
     ).isoformat()

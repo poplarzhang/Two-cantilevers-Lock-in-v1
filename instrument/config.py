@@ -24,7 +24,7 @@ OUTPUT_CHANNEL = 0
 OFFSET = 0
 
 # AC excitation amplitude in volts
-AMPLITUDE = 0.01
+AMPLITUDE = 0.001
 
 # Signal Inputs in volts
 # Increase range if the input signal saturates.
@@ -73,9 +73,9 @@ FILTER_ORDER = 4
 HARMONIC = 1
 
 # Frequency sweep parameters of start and stop frequency in Hertz, number of frequency points, sweeping in linear or log, window width of averaging
-F_START = 100
-F_STOP = 10000
-POINTS = 300
+F_START = 500
+F_STOP = 3000
+POINTS = 400
 SWEEP_MODE = "linear"
 AVERAGES = 10
 

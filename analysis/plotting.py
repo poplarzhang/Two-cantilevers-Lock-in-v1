@@ -148,7 +148,9 @@ def plot_amplitude_summary(
         color="#d62728",
         label="Demod 1",
         linewidth=1,
-        markersize=4
+        markersize=7,
+        markerfacecolor="none",
+        markeredgewidth=2
     )
 
     ax2.set_ylabel(
@@ -469,7 +471,9 @@ def plot_components_summary(
         color="#d62728",
         label="CL2 in-phase",
         linewidth=1,
-        markersize=4
+        markersize=7,
+        markerfacecolor="none",
+        markeredgewidth=2
     )
 
     ax2.plot(
@@ -479,7 +483,9 @@ def plot_components_summary(
         color="#d62728",
         label="CL2 quadrature",
         linewidth=1,
-        markersize=4
+        markersize=7,
+        markerfacecolor="none",
+        markeredgewidth=2
     )
 
     ax2.set_ylabel(
@@ -1189,17 +1195,37 @@ def plot_calibration_norm_diff(
         alpha=0.25
     )
 
-    for angle in np.arange(0, 360, 10):
+    # for angle in np.arange(0, 360, 10): //commented to avoid forced angle label on the plot 02OCT YZ
 
-        idx = np.argmin(
-            np.abs(
-                angles_cal - angle
-            )
-    )
+    #     idx = np.argmin(
+    #         np.abs(
+    #             angles_cal - angle
+    #         )
+    # )
 
-        if np.isfinite(
-        ND_cal[idx].real
-        ):
+    #     if np.isfinite(
+    #     ND_cal[idx].real
+    #     ):
+
+    #         ax.annotate(
+    #             f"{angle:+.0f}°",
+    #             (
+    #                 ND_cal[idx].real,
+    #                 ND_cal[idx].imag
+    #             ),
+    #             xytext=(4, 4),
+    #             textcoords="offset points",
+    #             fontsize=6,
+    #             bbox=dict(
+    #                 boxstyle="round,pad=0.15",
+    #                 fc="white",
+    #                 ec="none",
+    #                 alpha=0.65
+    #             )
+    #         )
+    for idx, angle in enumerate(angles_cal): # enumerate through available angles to avoid forced angle labels, begins 02OCT YZ
+
+        if np.isfinite(ND_cal[idx].real):
 
             ax.annotate(
                 f"{angle:+.0f}°",
@@ -1216,7 +1242,7 @@ def plot_calibration_norm_diff(
                     ec="none",
                     alpha=0.65
                 )
-            )
+            )# enumerate through available angles to avoid forced angle labels, ends 02OCT YZ
 
 
     ax.axhline(
@@ -1855,60 +1881,100 @@ def plot_fres_est(
     )
 
    # legend
+    # legend_handles = [ // legned automatically handles available possible results, commented begins 02OCT YZ
+
+    #     Line2D(
+    #         [0], [0],
+    #         color="gray",
+    #         linestyle="-",
+    #         marker=".",
+    #         markersize=6,
+    #         linewidth=1.0,
+    #         label="FRES residual"
+    #     ),
+
+    #     Line2D(
+    #         [0], [0],
+    #         marker="o",
+    #         color="green",
+    #         markerfacecolor="none",
+    #         linestyle="None",
+    #         markersize=8,
+    #         markeredgewidth=1.8,
+    #         label=(
+    #             f"{FRES_3[0]['angle']:+.0f}° - 1st "
+    #             f"- R={FRES_3[0]['residual']:.6f}"
+    #         )
+    #     ),
+
+    #     Line2D(
+    #         [0], [0],
+    #         marker="s",
+    #         color="orange",
+    #         markerfacecolor="none",
+    #         linestyle="None",
+    #         markersize=8,
+    #         markeredgewidth=1.8,
+    #         label=(
+    #             f"{FRES_3[1]['angle']:+.0f}° - 2nd "
+    #             f"- R={FRES_3[1]['residual']:.6f}"
+    #         )
+    #     ),
+
+    #     Line2D(
+    #         [0], [0],
+    #         marker="^",
+    #         color="red",
+    #         markerfacecolor="none",
+    #         linestyle="None",
+    #         markersize=8,
+    #         markeredgewidth=1.8,
+    #         label=(
+    #             f"{FRES_3[2]['angle']:+.0f}° - 3rd "
+    #             f"- R={FRES_3[2]['residual']:.6f}"
+    #         )
+    #     )
+    # ] // legned automatically handles available possible results, commented ends 02OCT YZ
+    # automatically generates legend handles for available possible results, begins 02OCT YZ
     legend_handles = [
+    Line2D(
+        [0], [0],
+        color="gray",
+        linestyle="-",
+        marker=".",
+        markersize=6,
+        linewidth=1.0,
+        label="FRES residual"
+    )
+]
 
-        Line2D(
-            [0], [0],
-            color="gray",
-            linestyle="-",
-            marker=".",
-            markersize=6,
-            linewidth=1.0,
-            label="FRES residual"
-        ),
+    markers = [
+        ("o", "green", "1st"),
+        ("s", "orange", "2nd"),
+        ("^", "red", "3rd")
+    ]
 
-        Line2D(
-            [0], [0],
-            marker="o",
-            color="green",
-            markerfacecolor="none",
-            linestyle="None",
-            markersize=8,
-            markeredgewidth=1.8,
-            label=(
-                f"{FRES_3[0]['angle']:+.0f}° - 1st "
-                f"- R={FRES_3[0]['residual']:.6f}"
-            )
-        ),
+    for i, (marker, color, rank) in enumerate(markers):
 
-        Line2D(
-            [0], [0],
-            marker="s",
-            color="orange",
-            markerfacecolor="none",
-            linestyle="None",
-            markersize=8,
-            markeredgewidth=1.8,
-            label=(
-                f"{FRES_3[1]['angle']:+.0f}° - 2nd "
-                f"- R={FRES_3[1]['residual']:.6f}"
-            )
-        ),
+        if i >= len(FRES_3):
+            break
 
-        Line2D(
-            [0], [0],
-            marker="^",
-            color="red",
-            markerfacecolor="none",
-            linestyle="None",
-            markersize=8,
-            markeredgewidth=1.8,
-            label=(
-                f"{FRES_3[2]['angle']:+.0f}° - 3rd "
-                f"- R={FRES_3[2]['residual']:.6f}"
+        legend_handles.append(
+            Line2D(
+                [0], [0],
+                marker=marker,
+                color=color,
+                markerfacecolor="none",
+                linestyle="None",
+                markersize=8,
+                markeredgewidth=1.8,
+                label=(
+                    f"{FRES_3[i]['angle']:+.0f}° - {rank} "
+                    f"- R={FRES_3[i]['residual']:.6f}"
+                )
             )
         )
-    ]
+    # automatically generates legend handles for available possible results, ends 02OCT YZ
 
     fig.subplots_adjust(
         right=0.72
