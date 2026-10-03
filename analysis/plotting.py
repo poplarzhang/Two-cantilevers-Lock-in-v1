@@ -1863,7 +1863,7 @@ def plot_fres_est(
     # Axes
     # --------------------------------------------------
     ax.set_xlabel(
-        "Angle (deg)"
+        f"Angle (deg)"
     )
 
     ax.set_ylabel(
@@ -1871,9 +1871,10 @@ def plot_fres_est(
     )
 
    # title
+    est_timestamp = comp_point_loc["AUE_timestamp"][:19].replace("T", " - ")
     ax.set_title(
         f"FRES Residual Estimation of CAL on {calib_timestamp}\n"
-        f"at {timestamp} for {pwr_point_loc_src}"
+        f"at {est_timestamp} for {pwr_point_loc_src}"
     )
 
     ax.grid(
