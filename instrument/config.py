@@ -24,7 +24,7 @@ OUTPUT_CHANNEL = 0
 OFFSET = 0
 
 # AC excitation amplitude in volts
-AMPLITUDE = 0.001
+AMPLITUDE = 0.02
 
 # Signal Inputs in volts
 # Increase range if the input signal saturates.
@@ -45,7 +45,7 @@ DEMOD_1 = 0
 DEMOD_2 = 1
 
 # Demodulator sample rates in samples/second
-DEMOD_RATE_1 = 1000
+DEMOD_RATE_1 = 1000 # modified from 1000 //04OCT YZ
 DEMOD_RATE_2 = 1000
 
 # ADC assignment.
@@ -73,8 +73,8 @@ FILTER_ORDER = 4
 HARMONIC = 1
 
 # Frequency sweep parameters of start and stop frequency in Hertz, number of frequency points, sweeping in linear or log, window width of averaging
-F_START = 500
-F_STOP = 3000
+F_START = 1820
+F_STOP = 1920
 POINTS = 400
 SWEEP_MODE = "linear"
 AVERAGES = 10

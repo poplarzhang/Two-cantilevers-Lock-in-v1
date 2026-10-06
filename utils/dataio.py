@@ -8,6 +8,10 @@ import json
 
 import numpy as np
 
+import pandas as pd # added to hanlde data operation, PIP required for pandas //05OCT YZ
+
+from pathlib import Path 
+
 timestamp = datetime.now().strftime("%y-%m-%d %H-%M")
 
 # ==========================================================
@@ -432,4 +436,38 @@ def save_summary(
 
     return filepath
     
+def cal_files_loader(dest_folder):
+    folder = Path(dest_folder)
+    cal_files = list(
+        folder.glob("*_angle_*.npy")
+    )
+    print(cal_files) # show target file path and name //05OCT YZ
+
+    return cal_files
+
+def npy_converter(npy_file):
+    raw_npy = np.load(npy_file, allow_pickle=True).item()
+
     
+    for key in raw_npy.keys():
+             
+        print(key, type(raw_npy[key]), np.shape(raw_npy[key]))
+
+    npy_con =  pd.DataFrame({
+        "time": raw_npy["time"],
+        "x_0": raw_npy["x_0"],
+        "y_0": raw_npy["y_0"],
+        "r_0": raw_npy["r_0"],
+        "phase_0": raw_npy["phase_0"],
+        "x_1": raw_npy["x_1"],
+        "y_1": raw_npy["y_1"],
+        "r_1": raw_npy["r_1"],
+        "phase_1": raw_npy["phase_1"],
+    })
+
+    print(npy_con)
+
+    output_csv = npy_file.with_name(npy_file.stem + "_csv.csv")
+    npy_con.to_csv(output_csv, index=False)
+
+    return

@@ -766,7 +766,7 @@ def est_FRES(comp_point_loc, calib_filepath):
             ]
         )
     
-    #print("FRES results list\n",FRES_result) # all FRES results are printed 30SEP YZ
+    print("FRES results list\n",FRES_result) # all FRES results are printed 30SEP YZ
 
     nearest_3 = np.argsort(FRES_result["residual"])[:3]
 
