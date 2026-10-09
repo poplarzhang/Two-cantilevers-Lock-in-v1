@@ -445,7 +445,7 @@ def cal_files_loader(dest_folder):
 
     return cal_files
 
-def npy_converter(npy_file):
+def npy_converter(npy_file): # convert npy file to csv file //05OCT YZ
     raw_npy = np.load(npy_file, allow_pickle=True).item()
 
     
@@ -470,4 +470,4 @@ def npy_converter(npy_file):
     output_csv = npy_file.with_name(npy_file.stem + "_csv.csv")
     npy_con.to_csv(output_csv, index=False)
 
-    return
+    return npy_con # add the return to support other functions //08OCT YZ

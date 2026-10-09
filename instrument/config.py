@@ -45,8 +45,8 @@ DEMOD_1 = 0
 DEMOD_2 = 1
 
 # Demodulator sample rates in samples/second
-DEMOD_RATE_1 = 1000 # modified from 1000 //04OCT YZ
-DEMOD_RATE_2 = 1000
+DEMOD_RATE_1 = 10000 # modified from 1000 //04OCT YZ
+DEMOD_RATE_2 = 10000
 
 # ADC assignment.
 #
@@ -64,18 +64,18 @@ OSCILLATOR_1 = 0
 OSCILLATOR_2 = 0
 
 # Lock-in filtering's time constant in seconds
-TIME_CONSTANT = 0.05
+TIME_CONSTANT = 0.0001 # changed from 0.05 //08OCT YZ
 
 # Low-pass filter order.
-FILTER_ORDER = 4
+FILTER_ORDER = 8
 
 # Detection harmonic.
 HARMONIC = 1
 
 # Frequency sweep parameters of start and stop frequency in Hertz, number of frequency points, sweeping in linear or log, window width of averaging
-F_START = 1820
-F_STOP = 1920
-POINTS = 400
+F_START = 1800
+F_STOP = 1900
+POINTS = 300
 SWEEP_MODE = "linear"
 AVERAGES = 10
 

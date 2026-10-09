@@ -2248,3 +2248,42 @@ def plot_AD_RMMAG_est(
         "AD_RMMAG estimation plotted and saved:",
         save_path
     )
+
+def plot_comps2time(csvtemp, cal_file): # plot the components of the calibration file // 08OCT YZ
+    # csvtemp is temporary csv data, cal_file is the calibration file //08OCT YZ
+    plt.figure(figsize=(10, 6))
+
+    counts = len(csvtemp["x_0"])
+    final_time = csvtemp["time"].iloc[-1]
+    
+    plt.plot(csvtemp["time"], csvtemp["x_0"], label="x_0")
+    plt.plot(csvtemp["time"], csvtemp["y_0"], label="y_0")
+    plt.plot(csvtemp["time"], csvtemp["x_1"], label="x_1")
+    plt.plot(csvtemp["time"], csvtemp["y_1"], label="y_1")
+
+
+    plt.title(f"counts = {counts}\n final {final_time}")
+    plt.xlabel("Time")
+    plt.ylabel("Amplitude")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+
+    output_plot = cal_file.with_name(
+        cal_file.stem + "_comps2time.png"
+    )
+    
+    plt.savefig(output_plot, dpi=300)
+
+    plt.show()
+
+    
+
+    plt.close()
+
+    print(f"Plot saved: {output_plot}")
+
+
+
+
+
