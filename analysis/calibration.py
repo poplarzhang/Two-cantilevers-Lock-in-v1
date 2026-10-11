@@ -1,16 +1,12 @@
-# analysis/calibration.py
-# Apply two cantilevers
-
 import os
+import glob
 from pathlib import Path
 import numpy as np
 from datetime import datetime
 
-# import the summary.csv to build calibration //19AUG YZ
 
-###################################commented for test 19AUG YZ ###################################################
 def build_calibration_from_csv(experiment_folder):
-    filename = os.path.join(experiment_folder, "summary.csv")
+    filename = os.path.join(experiment_folder, "LH_summary.csv") # changed from summary.csv to LH_summary.csv //11OCT YZ
 # load summary.csv
     data = np.genfromtxt(
         filename,

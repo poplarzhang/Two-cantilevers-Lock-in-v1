@@ -67,7 +67,7 @@ OSCILLATOR_2 = 0
 TIME_CONSTANT = 0.0001 # changed from 0.05 //08OCT YZ
 
 # Low-pass filter order.
-FILTER_ORDER = 8
+FILTER_ORDER = 8 # changed from 4 //09OCT YZ
 
 # Detection harmonic.
 HARMONIC = 1

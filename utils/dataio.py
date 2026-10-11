@@ -389,24 +389,21 @@ def save_fit(
         filepath
     )
 
-
     return filepath
 
 def save_summary(
     summary,
     folder,
-    filename="summary.csv"
+    filename#="summary.csv", # changed from filename = "summary.csv" to allow setting the filename by input from external calling function //11OCT YZ
 ):
     filepath = os.path.join(
         folder,
         filename
     )
 
-
     keys = list(
         summary.keys()
     )
-
 
     rows = zip(
         *[
@@ -414,7 +411,6 @@ def save_summary(
             for key in keys
         ]
     )
-
     with open(
         filepath,
         "w",
@@ -447,7 +443,6 @@ def cal_files_loader(dest_folder):
 
 def npy_converter(npy_file): # convert npy file to csv file //05OCT YZ
     raw_npy = np.load(npy_file, allow_pickle=True).item()
-
     
     for key in raw_npy.keys():
              
@@ -468,6 +463,6 @@ def npy_converter(npy_file): # convert npy file to csv file //05OCT YZ
     print(npy_con)
 
     output_csv = npy_file.with_name(npy_file.stem + "_csv.csv")
-    npy_con.to_csv(output_csv, index=False)
+    npy_con.to_csv(output_csv, index=False) #//skip saving action //09OCT YZ
 
     return npy_con # add the return to support other functions //08OCT YZ

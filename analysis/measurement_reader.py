@@ -105,8 +105,71 @@ def summarize_measurements(measurements): #all values are read and averaged for 
             np.mean(measurement["phase_1"])
         )
 
-
+    print(summary)
     return summary
+
+
+# new summary saving function, save the raw data from npy files for their second half //09OCT YZ
+def LH_summarize_measurements(measurements): #all values are read and averaged for one angle, no other operation or calculation happens //28AUG YZ
+
+    LH_summary = { # summary the second half = Lower Half of the raw data only
+        "angle": [],
+        "created": [],
+        "x_0": [], 
+        "y_0": [],
+        "x_1": [],
+        "y_1": [],
+        "r_0": [],
+        "r_1": [],
+        "phase_0": [],
+        "phase_1": []
+    }
+
+    for i, measurement in enumerate(
+        measurements,
+        start=1
+    ):
+        LH_summary["angle"].append(measurement["metadata"]
+            ["experiment_angle"])#summary["number"].append(i)
+        LH_summary["created"].append(measurement["metadata"]
+            ["timestamp"][:19].replace("T", " ")
+        )
+# all data is taking the 2nd half from the calibration files and averaged //09OCT YZ
+        LH_summary["x_0"].append(
+            np.mean(
+                measurement["x_0"][len(measurement["x_0"])//2:]
+            )
+        )
+        LH_summary["y_0"].append(
+            np.mean(
+                measurement["y_0"][len(measurement["y_0"])//2:]
+            )
+        )
+        LH_summary["x_1"].append(
+            np.mean(
+                measurement["x_1"][len(measurement["x_1"])//2:]
+            )
+        )
+        LH_summary["y_1"].append(
+            np.mean(   
+                measurement["y_1"][len(measurement["y_1"])//2:]
+            )
+        )
+        LH_summary["r_0"].append(
+            np.mean(measurement["r_0"][len(measurement["r_0"])//2:])
+        )
+        LH_summary["r_1"].append(
+            np.mean(measurement["r_1"][len(measurement["r_1"])//2:])
+        )
+        LH_summary["phase_0"].append(
+            np.mean(measurement["phase_0"][len(measurement["phase_0"])//2:])
+        )
+        LH_summary["phase_1"].append(
+            np.mean(measurement["phase_1"][len(measurement["phase_1"])//2:])
+        )
+
+    return LH_summary
+
 
 def fit_load(experiment_folder):
 

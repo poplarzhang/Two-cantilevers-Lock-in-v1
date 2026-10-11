@@ -1,6 +1,9 @@
 import os
 import numpy as np
+import glob
+
 from pathlib import Path
+
 from datetime import datetime
 
 from zhinst.toolkit import Session
@@ -569,17 +572,18 @@ def con_AUE( #convert a meansurement file of the angle under estimation to a dic
 # reading
     angle = data["metadata"]["experiment_angle"]
     AUE_time = data["metadata"]["timestamp"]
-    x0 = np.mean(data["x_0"])
-    y0 = np.mean(data["y_0"])
+# the following data is averaring the raw data's second half, in last rev was averaged from all raw data //09OCT YZ
+    x0 = np.mean(data["x_0"][len(data["x_0"])//2:]) # x0 = np.mean(data["x_0"]) was before 09OCT
+    y0 = np.mean(data["y_0"][len(data["y_0"])//2:]) # [len(data["x_0"])//2:] is added since 09OCT
 
-    x1 = np.mean(data["x_1"])
-    y1 = np.mean(data["y_1"])
+    x1 = np.mean(data["x_1"][len(data["x_1"])//2:])
+    y1 = np.mean(data["y_1"][len(data["y_1"])//2:])
 
-    r0 = np.mean(data["r_0"])
-    r1 = np.mean(data["r_1"])
+    r0 = np.mean(data["r_0"][len(data["r_0"])//2:])
+    r1 = np.mean(data["r_1"][len(data["r_1"])//2:])
 
-    phase0 = np.mean(data["phase_0"])
-    phase1 = np.mean(data["phase_1"])
+    phase0 = np.mean(data["phase_0"][len(data["phase_0"])//2:])
+    phase1 = np.mean(data["phase_1"][len(data["phase_1"])//2:])
 
 # converting
     z0 = x0 + 1j * y0
