@@ -135,37 +135,47 @@ def LH_summarize_measurements(measurements): #all values are read and averaged f
             ["timestamp"][:19].replace("T", " ")
         )
 # all data is taking the 2nd half from the calibration files and averaged //09OCT YZ
+# change the average from the middle of the 2nd half with a range of 5% //15OCT YZ
+        ave_base = len(measurement["x_0"]*3//4) # the position of defined middle //15OCT YZ
+        ave_window = len(measurement["x_0"]//40)# the half range of defined records, set to 2.5% of total records quantity //15OCT YZ
+
+        # 2nd half to generate the average from 09OCT YZ
+        # LH_summary["x_0"].append(
+        #     np.mean(
+        #         measurement["x_0"][len(measurement["x_0"])//2:]
+        #     )
+        # )
         LH_summary["x_0"].append(
-            np.mean(
-                measurement["x_0"][len(measurement["x_0"])//2:]
+             np.mean(
+                measurement["x_0"][(ave_base-ave_window):(ave_base+ave_window)]
             )
         )
         LH_summary["y_0"].append(
             np.mean(
-                measurement["y_0"][len(measurement["y_0"])//2:]
+                measurement["y_0"][(ave_base-ave_window):(ave_base+ave_window)]
             )
         )
         LH_summary["x_1"].append(
             np.mean(
-                measurement["x_1"][len(measurement["x_1"])//2:]
+                measurement["x_1"][(ave_base-ave_window):(ave_base+ave_window)]
             )
         )
         LH_summary["y_1"].append(
             np.mean(   
-                measurement["y_1"][len(measurement["y_1"])//2:]
+                measurement["y_1"][(ave_base-ave_window):(ave_base+ave_window)]
             )
         )
         LH_summary["r_0"].append(
-            np.mean(measurement["r_0"][len(measurement["r_0"])//2:])
+            np.mean(measurement["r_0"][(ave_base-ave_window):(ave_base+ave_window)])
         )
         LH_summary["r_1"].append(
-            np.mean(measurement["r_1"][len(measurement["r_1"])//2:])
+            np.mean(measurement["r_1"][(ave_base-ave_window):(ave_base+ave_window)])
         )
         LH_summary["phase_0"].append(
-            np.mean(measurement["phase_0"][len(measurement["phase_0"])//2:])
+            np.mean(measurement["phase_0"][(ave_base-ave_window):(ave_base+ave_window)])
         )
         LH_summary["phase_1"].append(
-            np.mean(measurement["phase_1"][len(measurement["phase_1"])//2:])
+            np.mean(measurement["phase_1"][(ave_base-ave_window):(ave_base+ave_window)])
         )
 
     return LH_summary

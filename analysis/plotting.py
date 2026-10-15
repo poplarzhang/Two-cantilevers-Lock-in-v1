@@ -1997,7 +1997,7 @@ def plot_fres_est(
         bbox_inches="tight"
     )
 
-    plt.show()
+    # plt.show() //disable plot showing 14OCT YZ
     plt.close()
 
     print(
@@ -2262,7 +2262,7 @@ def plot_comps2time(csvtemp, cal_file): # plot the components of the calibration
     plt.plot(csvtemp["time"], csvtemp["y_1"], label="y_1")
 
 
-    plt.title(f"counts = {counts}\n final {final_time}")
+    plt.title(f"{cal_file.stem}\n{timestamp}\ncounts = {counts}\nfinal {final_time}")
     plt.xlabel("Time")
     plt.ylabel("Amplitude")
     plt.legend()
@@ -2275,7 +2275,7 @@ def plot_comps2time(csvtemp, cal_file): # plot the components of the calibration
     
     plt.savefig(output_plot, dpi=300)
 
-    plt.show()
+    # plt.show()
 
     
 

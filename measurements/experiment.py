@@ -573,17 +573,21 @@ def con_AUE( #convert a meansurement file of the angle under estimation to a dic
     angle = data["metadata"]["experiment_angle"]
     AUE_time = data["metadata"]["timestamp"]
 # the following data is averaring the raw data's second half, in last rev was averaged from all raw data //09OCT YZ
-    x0 = np.mean(data["x_0"][len(data["x_0"])//2:]) # x0 = np.mean(data["x_0"]) was before 09OCT
-    y0 = np.mean(data["y_0"][len(data["y_0"])//2:]) # [len(data["x_0"])//2:] is added since 09OCT
+# change the average to the 2nd half's middle point with a range of 5% //15OCT YZ
+    ave_base = len(data["x_0"]*3//4) # the position of defined middle //15OCT YZ
+    ave_window = len(data["x_0"]//40)
 
-    x1 = np.mean(data["x_1"][len(data["x_1"])//2:])
-    y1 = np.mean(data["y_1"][len(data["y_1"])//2:])
+    x0 = np.mean(data["x_0"][(ave_base-ave_window):(ave_base+ave_window)]) # x0 = np.mean(data["x_0"]) was before 09OCT, changed to (ave_base-ave_window):(ave_base+ave_window) 15OCT
+    y0 = np.mean(data["y_0"][(ave_base-ave_window):(ave_base+ave_window)]) # [len(data["x_0"])//2:] is added since 09OCT
 
-    r0 = np.mean(data["r_0"][len(data["r_0"])//2:])
-    r1 = np.mean(data["r_1"][len(data["r_1"])//2:])
+    x1 = np.mean(data["x_1"][(ave_base-ave_window):(ave_base+ave_window)])
+    y1 = np.mean(data["y_1"][(ave_base-ave_window):(ave_base+ave_window)])
 
-    phase0 = np.mean(data["phase_0"][len(data["phase_0"])//2:])
-    phase1 = np.mean(data["phase_1"][len(data["phase_1"])//2:])
+    r0 = np.mean(data["r_0"][(ave_base-ave_window):(ave_base+ave_window)])
+    r1 = np.mean(data["r_1"][(ave_base-ave_window):(ave_base+ave_window)])
+
+    phase0 = np.mean(data["phase_0"][(ave_base-ave_window):(ave_base+ave_window)])
+    phase1 = np.mean(data["phase_1"][(ave_base-ave_window):(ave_base+ave_window)])
 
 # converting
     z0 = x0 + 1j * y0

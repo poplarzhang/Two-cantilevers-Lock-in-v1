@@ -434,9 +434,13 @@ def save_summary(
     
 def cal_files_loader(dest_folder):
     folder = Path(dest_folder)
-    cal_files = list(
-        folder.glob("*_angle_*.npy")
-    )
+    cal_files = [
+        f for f in folder.glob("*.npy")
+        if "calibration" not in f.name.lower()
+    ]
+    # cal_files = list(
+    #     folder.glob("*.npy") # all files with .npy extension in the folder will be loaded //14OCT YZ
+    # )
     print(cal_files) # show target file path and name //05OCT YZ
 
     return cal_files
