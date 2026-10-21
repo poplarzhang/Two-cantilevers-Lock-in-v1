@@ -136,8 +136,9 @@ def LH_summarize_measurements(measurements): #all values are read and averaged f
         )
 # all data is taking the 2nd half from the calibration files and averaged //09OCT YZ
 # change the average from the middle of the 2nd half with a range of 5% //15OCT YZ
-        ave_base = len(measurement["x_0"]*3//4) # the position of defined middle //15OCT YZ
-        ave_window = len(measurement["x_0"]//40)# the half range of defined records, set to 2.5% of total records quantity //15OCT YZ
+# correct the base and window for averaging
+        ave_base = len(measurement["x_0"])*3//4 # the position of defined middle //15OCT YZ
+        ave_window = len(measurement["x_0"])//40# the half range of defined records, set to 2.5% of total records quantity //15OCT YZ
 
         # 2nd half to generate the average from 09OCT YZ
         # LH_summary["x_0"].append(

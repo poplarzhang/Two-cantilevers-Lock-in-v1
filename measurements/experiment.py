@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import glob
+import pandas as pd #added to enable CSV file operation 21OCT YZ
 
 from pathlib import Path
 
@@ -574,8 +575,8 @@ def con_AUE( #convert a meansurement file of the angle under estimation to a dic
     AUE_time = data["metadata"]["timestamp"]
 # the following data is averaring the raw data's second half, in last rev was averaged from all raw data //09OCT YZ
 # change the average to the 2nd half's middle point with a range of 5% //15OCT YZ
-    ave_base = len(data["x_0"]*3//4) # the position of defined middle //15OCT YZ
-    ave_window = len(data["x_0"]//40)
+    ave_base = len(data["x_0"])*3//4 # the position of defined middle //15OCT YZ
+    ave_window = len(data["x_0"])//40
 
     x0 = np.mean(data["x_0"][(ave_base-ave_window):(ave_base+ave_window)]) # x0 = np.mean(data["x_0"]) was before 09OCT, changed to (ave_base-ave_window):(ave_base+ave_window) 15OCT
     y0 = np.mean(data["y_0"][(ave_base-ave_window):(ave_base+ave_window)]) # [len(data["x_0"])//2:] is added since 09OCT
@@ -642,6 +643,100 @@ def con_AUE( #convert a meansurement file of the angle under estimation to a dic
 
     return val_for_loc   
 
+def con_AUE_series(aue_filename): 
+    data = np.load(
+            aue_filename,
+            allow_pickle=True
+        ).item()
+    # reading
+    angle = data["metadata"]["experiment_angle"]
+    AUE_time = data["metadata"]["timestamp"][:19]
+    # take a window from raw data
+    series_base = len(data["x_0"])*3//4
+    series_window = len(data["x_0"])//40
+
+    x0 = data["x_0"][(series_base-series_window):(series_base+series_window)]
+    y0 = data["y_0"][(series_base-series_window):(series_base+series_window)]
+
+    x1 = data["x_1"][(series_base-series_window):(series_base+series_window)]
+    y1 = data["y_1"][(series_base-series_window):(series_base+series_window)]
+
+    r0 = data["r_0"][(series_base-series_window):(series_base+series_window)]
+    r1 = data["r_1"][(series_base-series_window):(series_base+series_window)]
+
+
+    
+    # generate new complex number
+    z0 = x0 + 1j * y0
+    z1 = x1 + 1j * y1
+
+    #power_mag = abs(z0)**2 +abs(z1)**2
+
+    count_groups = 50 # set to 50 groups for raw data
+    print("mean value is taken from ", series_base, 
+          " of raw records, and covers its neighbor with a radius of ", series_window,
+          " divided in to ", count_groups,
+          " groups. \n"
+          )
+
+    z0_g_avg = np.array([
+        np.mean(group)
+        for group in np.array_split(z0, count_groups)
+    ])
+
+    z1_g_avg = np.array([
+        np.mean(group)
+        for group in np.array_split(z1, count_groups)
+    ])
+
+    r0_g_avg = np.array([
+        np.mean(group)
+        for group in np.array_split(r0, count_groups)
+    ])
+
+    r1_g_avg = np.array([
+        np.mean(group)
+        for group in np.array_split(r1, count_groups)
+    ])
+
+    power_mag_g_avg = abs(z0_g_avg)**2 + abs(z1_g_avg)**2
+
+
+    # record
+    val_for_loc = {
+    
+            "angle":
+                angle,
+            "Cantilever 1":
+                z0_g_avg,
+            "Cantilever 2":
+                z1_g_avg,
+            # "ratio_points":
+            #     np.array([ratio_points]),
+            # "diff_points":
+            #     np.array([diff_points]),
+            # "ratio_mean_mag":
+            #     np.array([ratio_mean_mag]),
+            "r_0":
+                r0_g_avg,
+            "r_1":
+                r1_g_avg,
+            # "phase_0":
+            #     np.array([phase0]),
+            # "phase_1":
+            #     np.array([phase1]),
+            # "norm_diff":
+            #     np.array([norm_diff]),
+            "power":
+                power_mag_g_avg, 
+            "source_file":
+                [Path(aue_filename).name],
+            "created":
+                AUE_time
+        }
+
+    return val_for_loc
+    
 
 # estimation of an point's angle //20AUG YZ
 # LDND = Least Difference of Normalized Difference of mean of response of cantilevers //20AUG YZ
@@ -697,13 +792,16 @@ def est_LDND(norm_diff_point_loc, calib_filepath):
 
 
 #FRES, estimation by Full RESidual //28AUG YZ
-def est_FRES(comp_point_loc, calib_filepath):
+def est_FRES(comp_point_loc, calib_filepath, csv_filepath):
 
   # read calibration data
     calibration = np.load(
         calib_filepath,
         allow_pickle=True
     ).item()
+
+    #sum_filepath = csv_filepath
+    print(csv_filepath)
 
     angles_cal = calibration["angles"] 
     cal_z0 = calibration["Cantilever 1"]
@@ -808,6 +906,173 @@ def est_FRES(comp_point_loc, calib_filepath):
         
     return AUE_3, FRES_result
 
+
+def est_FRES_series(comp_point_loc, calib_filepath, sum_filepath):
+
+  # read calibration data
+    calibration = np.load(
+        calib_filepath,
+        allow_pickle=True
+    ).item()
+    print(calib_filepath)
+    print(sum_filepath)
+
+    angles_cal = calibration["angles"] 
+    cal_z0 = calibration["Cantilever 1"]
+    cal_z1 = calibration["Cantilever 2"]
+    cal_power =  calibration["power"]   
+
+  # read value for estimation
+
+    comp_point_loc_z0 = np.asarray(comp_point_loc["z0"], dtype=complex)
+    comp_point_loc_z1 = np.asarray(comp_point_loc["z1"], dtype=complex)
+    comp_point_loc_vec = np. array( 
+        [
+            comp_point_loc_z0,
+            comp_point_loc_z1
+        ],
+        dtype=complex
+    )
+    comp_point_loc_power = np.asarray(comp_point_loc["power"], dtype= float)
+
+    if not(
+        len(comp_point_loc_z0)
+        == len(comp_point_loc_z1)
+        == len(comp_point_loc_power)
+    ):
+        raise ValueError("lengths of cantilvers response array not match")
+
+    FRES_result = []
+
+    for z0_i, z1_i, power_i, angle_i in zip( # i is used to mark values in the arrays of responses from cantilever
+        cal_z0,
+        cal_z1,
+        cal_power,
+        angles_cal
+    ):
+        cal_vec = np.array(
+            [
+                z0_i,
+                z1_i
+            ],
+            dtype = complex
+        )
+        if (
+            not np.isfinite(power_i)
+            or power_i < 1e-30
+            or not np.all(np.isfinite(cal_vec))
+        ):
+            mean_residual = np.inf
+            mean_ccon = 0 + 0j
+
+        else:
+            residuals = []
+            ccon_values = []
+
+            # Compare with each measurement group
+            for j in range(comp_point_loc_vec.shape[1]):
+
+                point_vec = comp_point_loc_vec[:, j]
+                point_power = comp_point_loc_power[j]
+
+                # Skip invalid measurement data
+                if (
+                    not np.isfinite(point_power)
+                    or point_power < 1e-30
+                    or not np.all(np.isfinite(point_vec))
+                ):
+                    continue
+
+                # Calculate complex scaling factor
+                ccon = np.vdot(
+                    cal_vec,
+                    point_vec
+                ) / power_i
+
+                # Calculate residual
+                residual = np.linalg.norm(
+                    point_vec - ccon * cal_vec
+                )
+
+                residuals.append(residual)
+                ccon_values.append(ccon)
+
+            # Calculate mean residual for this angle
+            if len(residuals) > 0:
+                mean_residual = np.mean(residuals)
+                mean_ccon = np.mean(ccon_values)
+            else:
+                mean_residual = np.inf
+                mean_ccon = 0 + 0j
+
+        FRES_result.append(
+            (
+                angle_i,
+                mean_residual,
+                mean_ccon
+            )
+        )
+
+    # Convert results to a array
+    FRES_result = np.array(
+        FRES_result,
+        dtype=[
+            ("angle", "f8"),
+            ("residual", "f8"),
+            ("ccon", "c16")
+        ]
+    )
+
+    # print("FRES results \n", FRES_result)
+ 
+
+    # sort to get the top minimal
+    nearest_3 = np.argsort(
+        FRES_result["residual"]
+    )[:3]
+
+    AUE_3 = []
+    result_rows = [] # define a new table to save estimation result
+
+    for idx in nearest_3:
+
+        AUE_3.append({
+            "index": int(idx),
+            "angle": FRES_result["angle"][idx],
+            "residual": FRES_result["residual"][idx],
+            "C": FRES_result["ccon"][idx],
+            "est_source_file":comp_point_loc["source_file"]
+        })
+
+        print(
+            f"Angle: {FRES_result['angle'][idx]:.1f}°, "
+            f"Mean residual: {FRES_result['residual'][idx]:.6f}, "
+            f"Mean C: {FRES_result['ccon'][idx]} "
+            f"Source of estimation: {comp_point_loc['source_file']}"
+        )
+
+        result_rows.append({
+        "angle": FRES_result["angle"][idx],
+        "mean_residual": FRES_result["residual"][idx],
+        "C": FRES_result["ccon"][idx],
+        "source_file": ", ".join(comp_point_loc['source_file'])
+        if isinstance(comp_point_loc['source_file'], list)
+        else comp_point_loc['source_file']
+    })
+
+    
+    result_df = pd.DataFrame(result_rows)
+
+    result_df.to_csv(
+        sum_filepath,
+        mode="a",
+        header=not sum_filepath.exists(),
+        index=False
+    )
+
+    
+
+    return AUE_3, FRES_result
 
 
 def est_AD_RMMAG(rmmag_point_loc, calib_filepath): # absolute difference of ratio of mean magnitude 

@@ -464,6 +464,12 @@ def npy_converter(npy_file): # convert npy file to csv file //05OCT YZ
         "phase_1": raw_npy["phase_1"],
     })
 
+    npytime = raw_npy["metadata"]["timestamp"][:19]
+
+
+    npy_con.insert(0, "timestamp", npytime)
+
+
     print(npy_con)
 
     output_csv = npy_file.with_name(npy_file.stem + "_csv.csv")
