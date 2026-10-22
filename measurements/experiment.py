@@ -792,7 +792,7 @@ def est_LDND(norm_diff_point_loc, calib_filepath):
 
 
 #FRES, estimation by Full RESidual //28AUG YZ
-def est_FRES(comp_point_loc, calib_filepath, csv_filepath):
+def est_FRES(comp_point_loc, calib_filepath, sum_filepath):
 
   # read calibration data
     calibration = np.load(
@@ -800,8 +800,7 @@ def est_FRES(comp_point_loc, calib_filepath, csv_filepath):
         allow_pickle=True
     ).item()
 
-    #sum_filepath = csv_filepath
-    print(csv_filepath)
+    print(sum_filepath)
 
     angles_cal = calibration["angles"] 
     cal_z0 = calibration["Cantilever 1"]
@@ -877,6 +876,8 @@ def est_FRES(comp_point_loc, calib_filepath, csv_filepath):
     nearest_3 = np.argsort(FRES_result["residual"])[:3]
 
     AUE_3 = []
+    result_rows = []
+
     print()
     print("Full residual estimation results list")
     for idx in nearest_3:
@@ -903,6 +904,27 @@ def est_FRES(comp_point_loc, calib_filepath, csv_filepath):
             f"C: "
             f"{FRES_result['ccon'][idx]}"
         )
+
+
+        result_rows.append({
+                    "angle": FRES_result["angle"][idx],
+                    "residual": FRES_result["residual"][idx],
+                    "C": FRES_result["ccon"][idx],
+                    "source_file": ", ".join(comp_point_loc['source_file'])
+                    if isinstance(comp_point_loc['source_file'], list)
+                    else comp_point_loc['source_file']
+                })
+        
+            
+    result_df = pd.DataFrame(result_rows)
+        
+    result_df.to_csv(
+        sum_filepath,
+        mode="a",
+        header=not sum_filepath.exists(),
+        index=False
+    )    
+        
         
     return AUE_3, FRES_result
 
@@ -1052,13 +1074,13 @@ def est_FRES_series(comp_point_loc, calib_filepath, sum_filepath):
         )
 
         result_rows.append({
-        "angle": FRES_result["angle"][idx],
-        "mean_residual": FRES_result["residual"][idx],
-        "C": FRES_result["ccon"][idx],
-        "source_file": ", ".join(comp_point_loc['source_file'])
-        if isinstance(comp_point_loc['source_file'], list)
-        else comp_point_loc['source_file']
-    })
+            "angle": FRES_result["angle"][idx],
+            "residual": FRES_result["residual"][idx],
+            "C": FRES_result["ccon"][idx],
+            "source_file": ", ".join(comp_point_loc['source_file'])
+            if isinstance(comp_point_loc['source_file'], list)
+            else comp_point_loc['source_file']
+        })
 
     
     result_df = pd.DataFrame(result_rows)
@@ -1068,9 +1090,7 @@ def est_FRES_series(comp_point_loc, calib_filepath, sum_filepath):
         mode="a",
         header=not sum_filepath.exists(),
         index=False
-    )
-
-    
+    )    
 
     return AUE_3, FRES_result
 
